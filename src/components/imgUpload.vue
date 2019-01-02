@@ -20,12 +20,40 @@
 
 
         <h3>이미지</h3>
-        <label for="i_time"> i(image): </label>
-        <input type="number" id="i_time">
-        <label for="b_time"> b(blank): </label>
-        <input type="number" id="b_time">
-        <label for="q_time"> q(quesion): </label>
-        <input type="number" id="q_time">
+            <div class="taskElement">
+                 i(image):
+                <input type="radio" id="i_time" value="time" v-model="i_tranMethod">
+                <label for="i_time">Time</label>
+                <input type="radio" id="i_keyboard" value="keyboard" v-model="i_tranMethod">
+                <label for="i_keyboard">keyboard</label>
+                <br>
+                <div v-if="i_tranMethod=='time'">
+                    <input type="number" > milisecond
+                </div>
+            </div>
+            <div class="taskElement">
+                b(blank):
+                <input type="radio" id="b_time" value="time" v-model="b_tranMethod">
+                <label for="i_time">Time</label>
+                <input type="radio" id="b_keyboard" value="keyboard" v-model="b_tranMethod">
+                <label for="i_keyboard">keyboard</label>
+                <br>
+                <div v-if="b_tranMethod=='time'">
+                    <input type="number" > milisecond
+                </div>
+            </div>
+            <div class="taskElement">
+                q(question):
+                <input type="radio" id="q_time" value="time" v-model="q_tranMethod">
+                <label for="i_time">Time</label>
+                <input type="radio" id="q_keyboard" value="keyboard" v-model="q_tranMethod">
+                <label for="i_keyboard">keyboard</label>
+                <br>
+                <div v-if="q_tranMethod=='time'">
+                    <input type="number" > milisecond
+                </div>
+            </div>
+
         <br>
 
         </div>
@@ -242,7 +270,10 @@
         width:50px;
     }
     .taskSetting{
-        margin-bottom: 10px;
+        margin-bottom: 30px;
+    }
+    .taskElement{
+        margin-bottom:10px;
     }
     .slideImg{
         z-index:1;
