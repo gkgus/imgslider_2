@@ -35,11 +35,9 @@
             <label for="keyboard">keyboard</label>
         </div>
         <br>
-        <div v-if="imgList[clickedImg+1].tranMethod=='time'" >
+        <div v-if="imgList[clickedImg+1].tranMethod=='time'">
             <input type="number" v-model="imgList[clickedImg+1].time"> milisecond
         </div>
-
-        <button v-on:click="saveBtn" >저장</button>
 
 
 
@@ -140,13 +138,16 @@
 
             imgClicked(id){
                 console.log(id);
+                console.log(this.imgList[id])
                 this.clickedImg = id;
             },
             slideShowBtn(){
                 this.slideShowbtnClicked=true;
                // this.currentSlideImg= this.imgList[1].url;
+
                 this.slideShow();
                 //this.currentSlideImg= this.imgList[1].url;
+
             }
             ,slideShow(){
                 var thisVue = this;
@@ -158,13 +159,24 @@
                     function next() {
                         if( callback( array[i], i ) !== false ) {
                             if( ++i < array.length ) {
-                                console.log("METHOD>>"+array[i].tranMethod);
-                                console.log("TIME>>"+array[i].time);
-                                if(array[i].tranMethod)
-                                document.body.onkeydown = function(e) {
-                                    console.log("KEYPRESSED!!")
+                                console.log("number>>"+i);
+                                console.log("METHOD>>"+array[i-1].tranMethod);
+                                if(array[i-1].tranMethod=='keyboard'){
+                                    document.body.onkeydown = function() {
+                                        console.log("KEYPRESSED>>");
+                                        setTimeout( next, 1);
+                                    }
+
+                                } else if(array[i-1].tranMethod=='time'){
+                                    document.body.onkeydown = function() {
+                                        console.log("TIME_KEYPRESSED>>")
+                                    }
+                                    console.log("TIME>>"+array[i-1].time);
+                                    setTimeout( next, array[i-1].time);
                                 }
-                                setTimeout( next, array[i].time);
+
+
+
                             }
                         }
                     }
