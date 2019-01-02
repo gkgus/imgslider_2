@@ -139,7 +139,6 @@
                         console.log(imgData);
                         //this.previewImage = e.target.result;
                         //console.log(this.previewImage);
-
                     };
                 }
 
