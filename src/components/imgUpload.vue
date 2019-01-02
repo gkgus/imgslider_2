@@ -15,6 +15,21 @@
         </div>
 
         <br>
+
+        <div class="taskSetting">
+
+
+        <h3>이미지</h3>
+        <label for="i_time"> i(image): </label>
+        <input type="number" id="i_time">
+        <label for="b_time"> b(blank): </label>
+        <input type="number" id="b_time">
+        <label for="q_time"> q(quesion): </label>
+        <input type="number" id="q_time">
+        <br>
+
+        </div>
+
         <div class="imgInput">
             <input type="file" multiple accept="image/jpeg" @change=uploadImage>
         </div>
@@ -22,6 +37,8 @@
 
 
 <section>
+
+
 
     <div class="imgSetting"  v-if="clickedImg>=0">
 
@@ -38,8 +55,6 @@
         <div v-if="imgList[clickedImg+1].tranMethod=='time'">
             <input type="number" v-model="imgList[clickedImg+1].time"> milisecond
         </div>
-
-
 
     </div>
 
@@ -79,6 +94,9 @@
                 slideShowbtnClicked: false,
                 clickedImg: Number,
                 previewImage:null,
+                i_tranMethod:String,
+                b_tranMethod:String,
+                q_tranMethod:String,
                 tranMethod: String,
                 selectedImgId:Number,
                 currentSlideImg: "https://images.pexels.com/photos/237018/pexels-photo-237018.jpeg?cs=srgb&dl=asphalt-autumn-beauty-237018.jpg&fm=jpg",
@@ -116,7 +134,7 @@
                             url: e.target.result,
                             tranMethod:'time',
                             time: 2000
-                        }
+                        };
                         this.imgList.push(imgData);
                         console.log(imgData);
                         //this.previewImage = e.target.result;
@@ -200,6 +218,7 @@
 </script>
 
 <style scoped>
+
     .showImage{
         width:60%;
     }
@@ -219,6 +238,12 @@
     }
     html,body{
         height:100%;
+    }
+    input[type="number"] {
+        width:50px;
+    }
+    .taskSetting{
+        margin-bottom: 10px;
     }
     .slideImg{
         z-index:1;
