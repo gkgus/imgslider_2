@@ -7,11 +7,11 @@
         <br>
         <button v-on:click="slideShowBtn" >슬라이드쇼</button>
         <br>
-        <div class="slideImg" v-if="slideShowbtnClicked">
-
+        <div class="slideImg" v-if="slideShowbtnClicked" @click="slideImgClicked()">
             <slideShowImg :width="window.width"
                             :height="window.height"
-                            :imgsrc="currentSlideImg"></slideShowImg>
+                            :imgsrc="currentSlideImg"
+                            ></slideShowImg>
         </div>
 
         <br>
@@ -157,10 +157,11 @@
                     var i = 1;
                     next();
                     function next() {
-                        if( callback( array[i], i ) !== false ) {
+                        if( callback( array[i], i ) !== false && thisVue.slideShowbtnClicked  ) {
                             if( ++i < array.length ) {
                                 console.log("number>>"+i);
                                 console.log("METHOD>>"+array[i-1].tranMethod);
+
                                 if(array[i-1].tranMethod=='keyboard'){
                                     document.body.onkeydown = function() {
                                         console.log("KEYPRESSED>>");
@@ -190,6 +191,9 @@
 
 
 
+            },
+            slideImgClicked(){
+                this.slideShowbtnClicked=false;
             }
         }
     }
