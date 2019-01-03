@@ -87,6 +87,8 @@
 
     <div class="imgSetting"  v-if="clickedImg>=0">
 <!--이미지 개별의 전환 방식 -->
+        <br>
+        {{imgList[clickedImg].name}}
         <h3>이미지 전환 방식</h3>
 
         <div class="transitionMethod">
@@ -113,8 +115,6 @@
                     <h5>{{item.name}}</h5>
                 </div>
             </div>
-
-
         </div>
     </div>
 
@@ -130,6 +130,27 @@
     /*
     * <img src="https://www.gettyimages.com/gi-resources/images/CreativeLandingPage/HP_Sept_24_2018/CR3_GettyImages-159018836.jpg"
                  :width="window.width" :height="window.height">
+
+                 <div v-if="imgList[i].id>=0">
+                <div class="imgObj" @click="imgClicked(imgList[i].id)">
+                    <img :src="item.url" class="uploaded-image" />
+                    <h5>{{imgList[i].name}}</h5>
+                </div>
+            </div>
+
+
+        <div class="showImage">
+        <div v-for="item in imgList" class="inline"  :key="item.id" >
+            <div v-if="item.id>=0">
+                <div class="imgObj" @click="imgClicked(item.id)">
+                    <img :src="item.url" class="uploaded-image" />
+                    <h5>{{item.name}}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     * */
     /* eslint-disable no-console */
     import slideShowImg from './slideShowImg.vue'
@@ -142,12 +163,12 @@
                 slideShowbtnClicked: false,
                 clickedImg: Number,
                 previewImage:null,
-                i_tranMethod:String,
-                b_tranMethod:String,
-                q_tranMethod:String,
-                i_time:Number,
-                b_time:Number,
-                q_time:Number,
+                i_tranMethod:'time',
+                b_tranMethod:'time',
+                q_tranMethod:'time',
+                i_time:2000,
+                b_time:2000,
+                q_time:2000,
                 tranMethod: String,
                 selectedImgId:Number,
                 currentSlideImg: "https://images.pexels.com/photos/237018/pexels-photo-237018.jpeg?cs=srgb&dl=asphalt-autumn-beauty-237018.jpg&fm=jpg",
@@ -180,6 +201,7 @@
         },
 
         methods:{
+
 //이미지 불러오기
             uploadImage(imglist){
 
@@ -190,7 +212,7 @@
 
                     var tranMethod_str = 'time';
                     var time_num = 2000;
-
+                    this.imgList.length= imglist.target.files.length;
 //이미지 이름에 i,b,q가 들어가면 사전에 시간/키보드 설정.
                     reader.onload = e =>{
                         if(image.name.search('i')>0){
@@ -227,8 +249,8 @@
                             time: time_num
                         };
 
-
-                        this.imgList.push(imgData);
+                        this.imgList[i+1]= imgData;
+                        //this.imgList.push(imgData);
                         console.log(imgData);
                     };
                 }
@@ -244,7 +266,8 @@
 //이미지를 클릭하면 값이 나옴, 이미지 각각의 값을 조정할 때
             imgClicked(id){
                 console.log(id);
-                console.log(this.imgList[id+1])
+                console.log(this.imgList[id+1]);
+                console.log(this.imgList)
                 this.clickedImg = id+1;
             },
 
