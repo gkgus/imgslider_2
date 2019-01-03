@@ -5,8 +5,12 @@
         <span>{{window.width}} x {{window.height}}</span>
         <br>
         <br>
+
+<!--슬라이드쇼 시작-->
         <button v-on:click="slideShowBtn" >슬라이드쇼</button>
         <br>
+
+<!--슬라이드쇼에서 컴포넌트를 통해 이미지 보여줌-->
         <div class="slideImg" v-if="slideShowbtnClicked" @click="slideImgClicked()">
             <slideShowImg :width="window.width"
                             :height="window.height"
@@ -16,8 +20,7 @@
 
         <br>
 
-
-
+<!--csv 다운로드 링크-->
         <vue-csv-downloader
                 :data="exportData"
                 :fields="exportFields"
@@ -26,12 +29,11 @@
         </vue-csv-downloader>
 
 
+
+<!--이미지 이름에 i,b,q가 들어가면 사전에 시간/키보드 설정.-->
         <div class="taskSetting">
 
-
         <h3>이미지</h3>
-
-
             <div class="taskElement">
                 q(question):
                 <input type="radio" id="q_time" value="time" v-model="q_tranMethod">
@@ -72,6 +74,7 @@
 
         </div>
 
+<!--이미지 불러오기-->
         <div class="imgInput">
             <input type="file" multiple accept="image/jpeg" @change=uploadImage>
         </div>
@@ -83,23 +86,25 @@
 
 
     <div class="imgSetting"  v-if="clickedImg>=0">
-
+<!--이미지 개별의 전환 방식 -->
         <h3>이미지 전환 방식</h3>
 
         <div class="transitionMethod">
-            <input type="radio" id="time" value="time" v-model="imgList[clickedImg+1].tranMethod">
+            <input type="radio" id="time" value="time" v-model="imgList[clickedImg].tranMethod">
             <label for="time">Time</label>
             <br>
-            <input type="radio" id="keyboard" value="keyboard" v-model="imgList[clickedImg+1].tranMethod">
+            <input type="radio" id="keyboard" value="keyboard" v-model="imgList[clickedImg].tranMethod">
             <label for="keyboard">keyboard</label>
         </div>
         <br>
-        <div v-if="imgList[clickedImg+1].tranMethod=='time'">
-            <input type="number" v-model="imgList[clickedImg+1].time"> milisecond
+        <div v-if="imgList[clickedImg].tranMethod=='time'">
+            <input type="number" v-model="imgList[clickedImg].time"> milisecond
         </div>
 
     </div>
 
+
+<!--이미지 미리보기-->
     <div class="showImage">
         <div v-for="item in imgList" class="inline"  :key="item.id" >
             <div v-if="item.id>=0">
@@ -159,10 +164,10 @@
                         time: Number
                     }
                 ],
-                exportFields:['imageNum','keyInput'],
+                exportFields:['imageName','keyInput'],
                 exportData:[
                     {
-                        imageNum: 'image Number',
+                        imageName: 'image Number',
                         keyInput: 'User answer'
                     }
                 ]
@@ -175,6 +180,7 @@
         },
 
         methods:{
+//이미지 불러오기
             uploadImage(imglist){
 
                 for(let i=0;i<imglist.target.files.length;i++){
@@ -185,10 +191,10 @@
                     var tranMethod_str = 'time';
                     var time_num = 2000;
 
-
+//이미지 이름에 i,b,q가 들어가면 사전에 시간/키보드 설정.
                     reader.onload = e =>{
                         if(image.name.search('i')>0){
-                            console.log("IMAGE>>"+i)
+                            console.log("IMAGE>>"+i);
                             tranMethod_str=this.i_tranMethod;
                             if(this.i_tranMethod=='time'){
                                 time_num=this.i_time;
@@ -212,7 +218,7 @@
                             console.log("Nothing>>+i")
                             tranMethod_str='time';
                         }
-
+// imgData 구성한 뒤 imgList에 넣어줌.
                         var imgData = {
                             id: i,
                             name: image.name,
@@ -224,68 +230,73 @@
 
                         this.imgList.push(imgData);
                         console.log(imgData);
-                        //this.previewImage = e.target.result;
-                        //console.log(this.previewImage);
                     };
                 }
 
 
             },
+//슬라이드쇼에서 이미지가 전체 화면에 맞도록 화면 크기에따라 변경
             handleResize() {
                 this.window.width = window.innerWidth;
                 this.window.height = window.innerHeight;
             },
 
-            saveBtn(){
-                this.imgList[this.clickedImg+1].tranMethod=this.tranMethod;
-            },
-
+//이미지를 클릭하면 값이 나옴, 이미지 각각의 값을 조정할 때
             imgClicked(id){
                 console.log(id);
-                console.log(this.imgList[id])
-                this.clickedImg = id;
+                console.log(this.imgList[id+1])
+                this.clickedImg = id+1;
             },
+
+//슬라이드쇼 버튼을 누르면 slideShow() 호출
             slideShowBtn(){
                 this.slideShowbtnClicked=true;
-               // this.currentSlideImg= this.imgList[1].url;
-
                 this.slideShow();
-                //this.currentSlideImg= this.imgList[1].url;
 
             }
             ,slideShow(){
                 var thisVue = this;
 
+                var array = this.imgList;
+                slowEach( array,  function( element, index ) {
+                    thisVue.currentSlideImg= thisVue.imgList[index].url;
+                });
+
+
                 function slowEach( array, callback ) {
                     if( ! array.length ) return;
                     var i = 1;
-                    var exportimgnum = 1;
                     next();
                     function next() {
+//다음 슬라이드가 마지막이거나, 슬라이드쇼에서 클릭을 했을때(slideShowbtnClicked==false일 경우)
                         if( callback( array[i], i ) !== false && thisVue.slideShowbtnClicked  ) {
-                            if( ++i < array.length ) {
+                            if( i+1 < array.length ) {
                                 console.log("number>>"+i);
-                                console.log("METHOD>>"+array[i-1].tranMethod);
-
-                                if(array[i-1].tranMethod=='keyboard'){
+                                console.log("METHOD>>"+array[i].tranMethod);
+                                if(array[i].tranMethod=='keyboard'){
                                     document.body.onkeydown = function(e) {
                                         console.log("KEYPRESSED>>"+e.code);
                                         //KeyO, KeyX, KeyA
+//이미지 이름과 누른 키값을 keyData에 저장
+
                                         var keyData={
-                                            imageNum: exportimgnum,
+                                            imageName: thisVue.imgList[i].name,
                                             keyInput: e.code
                                         };
                                         thisVue.exportData.push(keyData);
-                                        exportimgnum++;
+                                        i+=1;
                                         setTimeout( next, 1);
                                     }
 
-                                } else if(array[i-1].tranMethod=='time'){
+
+                                } else if(array[i].tranMethod=='time'){
                                     document.body.onkeydown = function() {
                                         console.log("TIME_KEYPRESSED>>")
                                     }
-                                    console.log("TIME>>"+array[i-1].time);
-                                    setTimeout( next, array[i-1].time);
+                                    console.log("TIME>>"+array[i].time);
+                                    i+=1;
+                                    setTimeout( next, array[i].time);
+
                                 }
 
 
@@ -295,15 +306,8 @@
                     }
                 }
 
-                var array = this.imgList;
-                slowEach( array,  function( element, index ) {
-                    thisVue.currentSlideImg= thisVue.imgList[index].url;
-                    //console.log( element, index );
-                });
-
-
-
             },
+//슬라이드쇼에서 마우스를 클릭하면 나올 수 있도록 설정.
             slideImgClicked(){
                 this.slideShowbtnClicked=false;
             }
