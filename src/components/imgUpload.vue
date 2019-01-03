@@ -16,21 +16,31 @@
 
         <br>
 
+
+
+        <download-excel  :data = "json_data">
+            Download Data
+            <img src="download_icon.png"></download-excel>
+
+
         <div class="taskSetting">
 
 
         <h3>이미지</h3>
+
+
             <div class="taskElement">
-                 i(image):
-                <input type="radio" id="i_time" value="time" v-model="i_tranMethod">
-                <label for="i_time">Time</label>
-                <input type="radio" id="i_keyboard" value="keyboard" v-model="i_tranMethod">
-                <label for="i_keyboard">keyboard</label>
+                q(question):
+                <input type="radio" id="q_time" value="time" v-model="q_tranMethod">
+                <label for="q_time">Time</label>
+                <input type="radio" id="q_keyboard" value="keyboard" v-model="q_tranMethod">
+                <label for="q_keyboard">keyboard</label>
                 <br>
-                <div v-if="i_tranMethod=='time'">
-                    <input type="number" v-model="i_time"> milisecond
+                <div v-if="q_tranMethod=='time'">
+                    <input type="number" v-model="q_time"> milisecond
                 </div>
             </div>
+
             <div class="taskElement">
                 b(blank):
                 <input type="radio" id="b_time" value="time" v-model="b_tranMethod">
@@ -42,15 +52,16 @@
                     <input type="number" v-model="b_time"> milisecond
                 </div>
             </div>
+
             <div class="taskElement">
-                q(question):
-                <input type="radio" id="q_time" value="time" v-model="q_tranMethod">
-                <label for="q_time">Time</label>
-                <input type="radio" id="q_keyboard" value="keyboard" v-model="q_tranMethod">
-                <label for="q_keyboard">keyboard</label>
+                i(image):
+                <input type="radio" id="i_time" value="time" v-model="i_tranMethod">
+                <label for="i_time">Time</label>
+                <input type="radio" id="i_keyboard" value="keyboard" v-model="i_tranMethod">
+                <label for="i_keyboard">keyboard</label>
                 <br>
-                <div v-if="q_tranMethod=='time'">
-                    <input type="number" v-model="q_time"> milisecond
+                <div v-if="i_tranMethod=='time'">
+                    <input type="number" v-model="i_time"> milisecond
                 </div>
             </div>
 
@@ -143,7 +154,18 @@
                         tranMethod: String,
                         time: Number
                     }
-                ]
+                ],
+                json_fields:{
+                    img_name:"이미지 이름",
+                },
+                json_meta: [
+                    [
+                        {
+                            'key': 'charset',
+                            'value': 'utf-8'
+                        }
+                    ]
+                ],
             }
         },
         created() {
@@ -244,8 +266,12 @@
                                 console.log("METHOD>>"+array[i-1].tranMethod);
 
                                 if(array[i-1].tranMethod=='keyboard'){
-                                    document.body.onkeydown = function() {
-                                        console.log("KEYPRESSED>>");
+                                    document.body.onkeydown = function(e) {
+                                        console.log("KEYPRESSED>>"+e.code);
+                                        //KeyO, KeyX, KeyA
+                                        if(e.code=='KeyO'){
+                                            console.log("ooooo>>")
+                                        }
                                         setTimeout( next, 1);
                                     }
 
