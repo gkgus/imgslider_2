@@ -33,7 +33,7 @@
 <!--이미지 이름에 i,b,q가 들어가면 사전에 시간/키보드 설정.-->
         <div class="taskSetting">
 
-        <h3>이미지</h3>
+        <h3>이미지 이름별 설정</h3>
             <div class="taskElement">
                 q(question):
                 <input type="radio" id="q_time" value="time" v-model="q_tranMethod">
@@ -85,7 +85,7 @@
 
 
 
-    <div class="imgSetting"  v-if="clickedImg>=0">
+    <div class="imgSetting"  v-if="clickedImg>=1">
 <!--이미지 개별의 전환 방식 -->
         <br>
         {{imgList[clickedImg].name}}
@@ -104,7 +104,6 @@
         </div>
 
     </div>
-
 
 <!--이미지 미리보기-->
     <div class="showImage">
@@ -364,7 +363,12 @@
         width:50px;
     }
     .taskSetting{
+        margin-top:10px;
+        margin-left: 30%;
+        margin-right:30%;
         margin-bottom: 30px;
+        border-radius:5px;
+        border: 3px solid rgba(0, 0, 0, 0.48);
     }
     .taskElement{
         margin-bottom:10px;
