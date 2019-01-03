@@ -18,9 +18,12 @@
 
 
 
-        <download-excel  :data = "json_data">
-            Download Data
-            <img src="download_icon.png"></download-excel>
+        <vue-csv-downloader
+                :data="exportData"
+                :fields="exportFields"
+        >
+            csv download
+        </vue-csv-downloader>
 
 
         <div class="taskSetting">
@@ -125,9 +128,10 @@
     * */
     /* eslint-disable no-console */
     import slideShowImg from './slideShowImg.vue'
+    import VueCsvDownloader from 'vue-csv-downloader';
     export default {
         name: "imgUpload",
-        components:{slideShowImg},
+        components:{VueCsvDownloader, slideShowImg},
         data(){
             return{
                 slideShowbtnClicked: false,
@@ -155,17 +159,14 @@
                         time: Number
                     }
                 ],
-                json_fields:{
-                    img_name:"이미지 이름",
-                },
-                json_meta: [
-                    [
-                        {
-                            'key': 'charset',
-                            'value': 'utf-8'
-                        }
-                    ]
-                ],
+                exportFields:['imageNum','keyInput'],
+                exportData:[
+                    {
+                        imageNum: 'image Number',
+                        keyInput: 'User answer'
+                    }
+                ]
+
             }
         },
         created() {
@@ -258,6 +259,7 @@
                 function slowEach( array, callback ) {
                     if( ! array.length ) return;
                     var i = 1;
+                    var exportimgnum = 1;
                     next();
                     function next() {
                         if( callback( array[i], i ) !== false && thisVue.slideShowbtnClicked  ) {
@@ -269,9 +271,12 @@
                                     document.body.onkeydown = function(e) {
                                         console.log("KEYPRESSED>>"+e.code);
                                         //KeyO, KeyX, KeyA
-                                        if(e.code=='KeyO'){
-                                            console.log("ooooo>>")
-                                        }
+                                        var keyData={
+                                            imageNum: exportimgnum,
+                                            keyInput: e.code
+                                        };
+                                        thisVue.exportData.push(keyData);
+                                        exportimgnum++;
                                         setTimeout( next, 1);
                                     }
 
