@@ -28,29 +28,29 @@
                 <label for="i_keyboard">keyboard</label>
                 <br>
                 <div v-if="i_tranMethod=='time'">
-                    <input type="number" > milisecond
+                    <input type="number" v-model="i_time"> milisecond
                 </div>
             </div>
             <div class="taskElement">
                 b(blank):
                 <input type="radio" id="b_time" value="time" v-model="b_tranMethod">
-                <label for="i_time">Time</label>
+                <label for="b_time">Time</label>
                 <input type="radio" id="b_keyboard" value="keyboard" v-model="b_tranMethod">
-                <label for="i_keyboard">keyboard</label>
+                <label for="b_keyboard">keyboard</label>
                 <br>
                 <div v-if="b_tranMethod=='time'">
-                    <input type="number" > milisecond
+                    <input type="number" v-model="b_time"> milisecond
                 </div>
             </div>
             <div class="taskElement">
                 q(question):
                 <input type="radio" id="q_time" value="time" v-model="q_tranMethod">
-                <label for="i_time">Time</label>
+                <label for="q_time">Time</label>
                 <input type="radio" id="q_keyboard" value="keyboard" v-model="q_tranMethod">
-                <label for="i_keyboard">keyboard</label>
+                <label for="q_keyboard">keyboard</label>
                 <br>
                 <div v-if="q_tranMethod=='time'">
-                    <input type="number" > milisecond
+                    <input type="number" v-model="q_time"> milisecond
                 </div>
             </div>
 
@@ -125,6 +125,9 @@
                 i_tranMethod:String,
                 b_tranMethod:String,
                 q_tranMethod:String,
+                i_time:Number,
+                b_time:Number,
+                q_time:Number,
                 tranMethod: String,
                 selectedImgId:Number,
                 currentSlideImg: "https://images.pexels.com/photos/237018/pexels-photo-237018.jpeg?cs=srgb&dl=asphalt-autumn-beauty-237018.jpg&fm=jpg",
@@ -155,14 +158,47 @@
                     const reader = new FileReader();
                     const image = imglist.target.files[i];
                     reader.readAsDataURL(image);
+
+                    var tranMethod_str = 'time';
+                    var time_num = 2000;
+
+
                     reader.onload = e =>{
+                        if(image.name.search('i')>0){
+                            console.log("IMAGE>>"+i)
+                            tranMethod_str=this.i_tranMethod;
+                            if(this.i_tranMethod=='time'){
+                                time_num=this.i_time;
+                            }
+                        }
+                        else if (image.name.search('b')>0){
+                            console.log("BLANK>>"+i)
+                            tranMethod_str=this.b_tranMethod;
+                            if(this.b_tranMethod=='time'){
+                                time_num=this.b_time;
+                            }
+                        }
+                        else if( image.name.search('q')>0){
+                            console.log("QUESTION>>"+i)
+                            tranMethod_str=this.q_tranMethod;
+                            if(this.q_tranMethod=='time'){
+                                time_num=this.q_time;
+                            }
+                        }
+                        else{
+                            console.log("Nothing>>+i")
+                            tranMethod_str='time';
+                        }
+
                         var imgData = {
                             id: i,
                             name: image.name,
                             url: e.target.result,
-                            tranMethod:'time',
-                            time: 2000
+                            tranMethod: tranMethod_str,
+                            time: time_num
                         };
+
+
                         this.imgList.push(imgData);
                         console.log(imgData);
                         //this.previewImage = e.target.result;
