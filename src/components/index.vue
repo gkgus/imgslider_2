@@ -91,10 +91,10 @@
                         <input type="text" id="fileName" placeholder="파일 이름" v-model="fileName">
                         <br>
                         <br>
-                        <br>
 
                         <!--csv 다운로드-->
                         이미지별 Keyboard 입력값 저장:
+                        <br>
                         <vue-csv-downloader
                                 :data="exportKeyData"
                                 :fields="exportKeyFields"
@@ -103,7 +103,9 @@
                             {{fileName+'_keyResult'}} csv download
                         </vue-csv-downloader>
                         <br>
+                        <br>
                         참여자 목록 저장:
+                        <br>
                         <vue-csv-downloader
                                 :data="exportUserData"
                                 :fields="exportUserFields"
@@ -114,6 +116,7 @@
 
                     </div>
                     <br>
+
                 </td>
             </tr>
             </tbody>
@@ -127,7 +130,7 @@
 <!--이미지 불러오기-->
         <div class="imgInput">
             <h4>이미지 불러오기</h4>
-            <input type="file" multiple accept="image/jpeg" @change=uploadImage>
+            <input type="file" multiple accept="image/*" @change=uploadImage>
         </div>
 
 
@@ -305,10 +308,6 @@
                     };
                 }
                 this.imgList[imglist.target.files.length+1]= {
-                    id:'imglist.target.files.length+1',
-                    name:'thankyoumsg',
-                    tranMethod:'time',
-                    timie:2,
                     url:'http://cdn.shopify.com/s/files/1/1711/8411/products/placard_thx_cdf0763b-e1e2-45f0-98af-4c00d72c9180_1024x1024.png?v=1492780365'}
 
 
@@ -362,12 +361,12 @@
                             if( i+1 < array.length ) {
                                 console.log("number>>"+i);
                                 console.log("METHOD>>"+array[i].tranMethod);
+//tranMethod가 keyboard인 경우
                                 if(array[i].tranMethod=='keyboard'){
                                     document.body.onkeydown = function(e) {
                                         console.log("KEYPRESSED>>"+e.code);
                                         //KeyO, KeyX, KeyA 값이 필요
 //이미지 이름과 누른 키값을 keyData에 저장
-
                                         var keyData={
                                             imageName: thisVue.imgList[i].name,
                                             keyInput: e.code
