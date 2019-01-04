@@ -1,10 +1,17 @@
 <template>
   <div id="app">
-
-    <router-view/>
+    <index></index>
   </div>
 </template>
 <script>
+
+  import index from './components/index'
+  export default {
+    name: 'app',
+    components: {
+     index
+    }
+  }
   /*
   * <div id="nav">
       <router-link to="/">이미지 업로드</router-link> |

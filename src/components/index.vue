@@ -29,6 +29,7 @@
         <input type="text" id="userGender" placeholder="M/W" v-model="userInfo.gender">
         <label for="userAge"> 나이: </label>
         <input type="number" id="userAge" placeholder=0 v-model="userInfo.age"> 대
+        <button @click="userclearBtn">Refresh</button>
         <br>
 
     </div>
@@ -249,7 +250,14 @@
         },
 
         methods:{
-
+            userclearBtn(){
+              this.userInfo={
+                  name:"",
+                  nameEng:"",
+                  gender:"",
+                  age:Number
+              }
+            },
 //이미지 불러오기
             uploadImage(imglist){
 
@@ -302,6 +310,12 @@
                         console.log(imgData);
                     };
                 }
+                this.imgList[imglist.target.files.length+1]= {
+                    id:'imglist.target.files.length+1',
+                    name:'thankyoumsg',
+                    tranMethod:'time',
+                    timie:2000,
+                    url:'http://cdn.shopify.com/s/files/1/1711/8411/products/placard_thx_cdf0763b-e1e2-45f0-98af-4c00d72c9180_1024x1024.png?v=1492780365'}
 
 
             },
