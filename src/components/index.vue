@@ -98,9 +98,9 @@
                         <vue-csv-downloader
                                 :data="exportKeyData"
                                 :fields="exportKeyFields"
-                                :download-name="fileName+'_keyResult'"
+                                :download-name="fileName+'_keyResult.csv'"
                         >
-                            {{fileName+'_keyResult'}} csv download
+                            {{fileName+'_keyResult'}} .csv
                         </vue-csv-downloader>
                         <br>
                         <br>
@@ -109,9 +109,9 @@
                         <vue-csv-downloader
                                 :data="exportUserData"
                                 :fields="exportUserFields"
-                                :download-name="fileName + '_participant'"
+                                :download-name="fileName + '_participant.csv'"
                         >
-                            {{fileName+'_participant'}} csv download
+                            {{fileName+'_participant'}} .csv
                         </vue-csv-downloader>
 
                     </div>
