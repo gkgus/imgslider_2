@@ -20,27 +20,42 @@
 
         <br>
     <div class="userInfo">
-        <h3>참여자 정보 입력</h3>
+        <h4>참여자 정보 입력</h4>
         <label for="userName">이름: </label>
         <input type="text" id="userName" placeholder="이름" v-model="userInfo.name">
         <label for="userNameEng"> 영어 이름: </label>
         <input type="text" id="userNameEng" placeholder="Name" v-model="userInfo.nameEng">
+        <label for="userGender"> 성별: </label>
+        <input type="text" id="userGender" placeholder="M/W" v-model="userInfo.gender">
+        <label for="userAge"> 나이: </label>
+        <input type="number" id="userAge" placeholder=0 v-model="userInfo.age"> 대
         <br>
 
     </div>
 
-        <label for="fileName">파일 이름: </label>
-        <input type="text" id="fileName" placeholder="파일 이름" v-model="fileName">
-
-        <br>
+        <div class="userInfo">
+            <h4>파일 정보</h4>
+            <label for="fileName">파일 이름: </label>
+            <input type="text" id="fileName" placeholder="파일 이름" v-model="fileName">
+            <br>
+        </div>
 <!--csv 다운로드-->
-        이미지별 Keyboard 입력값 저장:
+            이미지별 Keyboard 입력값 저장:
+            <vue-csv-downloader
+                    :data="exportKeyData"
+                    :fields="exportKeyFields"
+                    :download-name="fileName+'_keyResult'"
+            >
+               {{fileName+'_keyResult'}} csv download
+            </vue-csv-downloader>
+        <br>
+            참여자 목록 저장:
         <vue-csv-downloader
-                :data="exportKeyData"
-                :fields="exportFields"
-                :download-name="fileName"
+                :data="exportUserData"
+                :fields="exportUserFields"
+                :download-name="fileName + '_participant'"
         >
-           {{fileName}} csv download
+            {{fileName+'_participant'}} csv download
         </vue-csv-downloader>
 
 
@@ -207,11 +222,22 @@
                         time: Number
                     }
                 ],
-                exportFields:['imageName','keyInput'],
+                exportKeyFields:['imageName','keyInput'],
                 exportKeyData:[
                     {
                         imageName: '이미지 이름',
                         keyInput: '입력한 키보드 값'
+                    }
+                ],
+                userId:1,
+                exportUserFields:['id','name','nameEng','gender','age'],
+                exportUserData:[
+                    {
+                        id:"순서",
+                        name: "이름",
+                        nameEng: "영문 이름",
+                        gender:"성별",
+                        age:"나이"
                     }
                 ]
 
@@ -301,8 +327,17 @@
             }
             ,slideShow(){
                 var thisVue = this;
+//export 될 초기 정보 작성: 유저 정보
                 this.exportKeyData.push({imageName: this.userInfo.name,
                     keyInput: this.userInfo.nameEng});
+                this.exportUserData.push({
+                    id: this.userId,
+                    name: this.userInfo.name,
+                    nameEng: this.userInfo.nameEng,
+                    gender: this.userInfo.gender,
+                    age: this.userInfo.age
+                });
+                this.userId= this.userId+1;
                 var array = this.imgList;
                 slowEach( array,  function( element, index ) {
                     thisVue.currentSlideImg= thisVue.imgList[index].url;
