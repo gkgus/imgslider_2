@@ -1,11 +1,12 @@
 <template>
     <div id="imgUpload">
         <h1>Image Slider</h1>
+        <!--
         현재 배경 크기:
         <span>{{window.width}} x {{window.height}}</span>
         <br>
         <br>
-
+-->
 <!--슬라이드쇼 시작-->
         <button v-on:click="slideShowBtn" >슬라이드쇼</button>
         <br>
@@ -34,79 +35,98 @@
 
     </div>
 
-        <div class="userInfo">
-            <h4>파일 정보</h4>
-            <label for="fileName">파일 이름: </label>
-            <input type="text" id="fileName" placeholder="파일 이름" v-model="fileName">
-            <br>
-        </div>
-<!--csv 다운로드-->
-            이미지별 Keyboard 입력값 저장:
-            <vue-csv-downloader
-                    :data="exportKeyData"
-                    :fields="exportKeyFields"
-                    :download-name="fileName+'_keyResult'"
-            >
-               {{fileName+'_keyResult'}} csv download
-            </vue-csv-downloader>
-        <br>
-            참여자 목록 저장:
-        <vue-csv-downloader
-                :data="exportUserData"
-                :fields="exportUserFields"
-                :download-name="fileName + '_participant'"
-        >
-            {{fileName+'_participant'}} csv download
-        </vue-csv-downloader>
+        <table class="tableSetting">
+            <tbody>
+            <tr>
+                <td class="taskSetting">
+                    <!--이미지 이름에 i,b,q가 들어가면 사전에 시간/키보드 설정.-->
+                    <div >
+
+                        <h4>이미지 이름별 설정</h4>
+                        <div class="taskElement">
+                            q(질문 이미지):
+                            <input type="radio" id="q_time" value="time" v-model="q_tranMethod">
+                            <label for="q_time">Time</label>
+                            <input type="radio" id="q_keyboard" value="keyboard" v-model="q_tranMethod">
+                            <label for="q_keyboard">keyboard</label>
+                            <br>
+                            <div v-if="q_tranMethod=='time'">
+                                <input type="number" v-model="q_time"> 초
+                            </div>
+                        </div>
+
+                        <div class="taskElement">
+                            b(blank 이미지):
+                            <input type="radio" id="b_time" value="time" v-model="b_tranMethod">
+                            <label for="b_time">Time</label>
+                            <input type="radio" id="b_keyboard" value="keyboard" v-model="b_tranMethod">
+                            <label for="b_keyboard">keyboard</label>
+                            <br>
+                            <div v-if="b_tranMethod=='time'">
+                                <input type="number" v-model="b_time"> 초
+                            </div>
+                        </div>
+
+                        <div class="taskElement">
+                            i(사진):
+                            <input type="radio" id="i_time" value="time" v-model="i_tranMethod">
+                            <label for="i_time">Time</label>
+                            <input type="radio" id="i_keyboard" value="keyboard" v-model="i_tranMethod">
+                            <label for="i_keyboard">keyboard</label>
+                            <br>
+                            <div v-if="i_tranMethod=='time'">
+                                <input type="number" v-model="i_time"> 초
+                            </div>
+                        </div>
+
+                        <br>
+
+                    </div>
+
+                </td>
+                <td class="fileInfo">
+                    <div >
+                        <h4>csv 파일 정보</h4>
+                        <label for="fileName">파일 이름: </label>
+                        <input type="text" id="fileName" placeholder="파일 이름" v-model="fileName">
+                        <br>
+                        <br>
+                        <br>
+
+                        <!--csv 다운로드-->
+                        이미지별 Keyboard 입력값 저장:
+                        <vue-csv-downloader
+                                :data="exportKeyData"
+                                :fields="exportKeyFields"
+                                :download-name="fileName+'_keyResult'"
+                        >
+                            {{fileName+'_keyResult'}} csv download
+                        </vue-csv-downloader>
+                        <br>
+                        참여자 목록 저장:
+                        <vue-csv-downloader
+                                :data="exportUserData"
+                                :fields="exportUserFields"
+                                :download-name="fileName + '_participant'"
+                        >
+                            {{fileName+'_participant'}} csv download
+                        </vue-csv-downloader>
+
+                    </div>
+                    <br>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
 
 
-<!--이미지 이름에 i,b,q가 들어가면 사전에 시간/키보드 설정.-->
-        <div class="taskSetting">
 
-        <h3>이미지 이름별 설정</h3>
-            <div class="taskElement">
-                q(question):
-                <input type="radio" id="q_time" value="time" v-model="q_tranMethod">
-                <label for="q_time">Time</label>
-                <input type="radio" id="q_keyboard" value="keyboard" v-model="q_tranMethod">
-                <label for="q_keyboard">keyboard</label>
-                <br>
-                <div v-if="q_tranMethod=='time'">
-                    <input type="number" v-model="q_time"> milisecond
-                </div>
-            </div>
 
-            <div class="taskElement">
-                b(blank):
-                <input type="radio" id="b_time" value="time" v-model="b_tranMethod">
-                <label for="b_time">Time</label>
-                <input type="radio" id="b_keyboard" value="keyboard" v-model="b_tranMethod">
-                <label for="b_keyboard">keyboard</label>
-                <br>
-                <div v-if="b_tranMethod=='time'">
-                    <input type="number" v-model="b_time"> milisecond
-                </div>
-            </div>
-
-            <div class="taskElement">
-                i(image):
-                <input type="radio" id="i_time" value="time" v-model="i_tranMethod">
-                <label for="i_time">Time</label>
-                <input type="radio" id="i_keyboard" value="keyboard" v-model="i_tranMethod">
-                <label for="i_keyboard">keyboard</label>
-                <br>
-                <div v-if="i_tranMethod=='time'">
-                    <input type="number" v-model="i_time"> milisecond
-                </div>
-            </div>
-
-        <br>
-
-        </div>
 
 <!--이미지 불러오기-->
         <div class="imgInput">
+            <h4>이미지 불러오기</h4>
             <input type="file" multiple accept="image/jpeg" @change=uploadImage>
         </div>
 
@@ -131,7 +151,7 @@
         </div>
         <br>
         <div v-if="imgList[clickedImg].tranMethod=='time'">
-            <input type="number" v-model="imgList[clickedImg].time"> milisecond
+            <input type="number" v-model="imgList[clickedImg].time"> 초
         </div>
 
     </div>
@@ -156,32 +176,6 @@
 </template>
 
 <script>
-    //        <router-link to="/slideShow">슬라이드쇼</router-link>
-    /*
-    * <img src="https://www.gettyimages.com/gi-resources/images/CreativeLandingPage/HP_Sept_24_2018/CR3_GettyImages-159018836.jpg"
-                 :width="window.width" :height="window.height">
-
-                 <div v-if="imgList[i].id>=0">
-                <div class="imgObj" @click="imgClicked(imgList[i].id)">
-                    <img :src="item.url" class="uploaded-image" />
-                    <h5>{{imgList[i].name}}</h5>
-                </div>
-            </div>
-
-
-        <div class="showImage">
-        <div v-for="item in imgList" class="inline"  :key="item.id" >
-            <div v-if="item.id>=0">
-                <div class="imgObj" @click="imgClicked(item.id)">
-                    <img :src="item.url" class="uploaded-image" />
-                    <h5>{{item.name}}</h5>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    * */
     /* eslint-disable no-console */
     import slideShowImg from './slideShowImg.vue'
     import VueCsvDownloader from 'vue-csv-downloader';
@@ -194,7 +188,7 @@
                     name:"",
                     nameEng:"",
                     gender:"",
-                    age:Number
+                    age:0
                 },
                 fileName:"",
                 slideShowbtnClicked: false,
@@ -203,9 +197,9 @@
                 i_tranMethod:'time',
                 b_tranMethod:'time',
                 q_tranMethod:'time',
-                i_time:2000,
-                b_time:2000,
-                q_time:2000,
+                i_time:2,
+                b_time:2,
+                q_time:2,
                 tranMethod: String,
                 selectedImgId:Number,
                 currentSlideImg: "https://images.pexels.com/photos/237018/pexels-photo-237018.jpeg?cs=srgb&dl=asphalt-autumn-beauty-237018.jpg&fm=jpg",
@@ -267,7 +261,7 @@
                     reader.readAsDataURL(image);
 
                     var tranMethod_str = 'time';
-                    var time_num = 2000;
+                    var time_num = 2;
                     this.imgList.length= imglist.target.files.length;
 //이미지 이름에 i,b,q가 들어가면 사전에 시간/키보드 설정.
                     reader.onload = e =>{
@@ -314,7 +308,7 @@
                     id:'imglist.target.files.length+1',
                     name:'thankyoumsg',
                     tranMethod:'time',
-                    timie:2000,
+                    timie:2,
                     url:'http://cdn.shopify.com/s/files/1/1711/8411/products/placard_thx_cdf0763b-e1e2-45f0-98af-4c00d72c9180_1024x1024.png?v=1492780365'}
 
 
@@ -390,7 +384,7 @@
                                     }
                                     console.log("TIME>>"+array[i].time);
                                     i+=1;
-                                    setTimeout( next, array[i-1].time);
+                                    setTimeout( next, array[i-1].time*1000);
 
                                 }
 
@@ -441,18 +435,38 @@
     input[type="text"]{
         width:100px;
     }
+    .tableSetting{
+        width: 100%;
+        margin-right:20%;
+        padding-right: 20%;
+        padding-left: 20%;
+    }
     .taskSetting{
-        margin-top:10px;
-        margin-left: 30%;
-        margin-right:30%;
-        margin-bottom: 30px;
         border-radius:5px;
         border: 3px solid rgba(0, 0, 0, 0.48);
+        line-height:25px;
+
+
+    }
+    .fileInfo{
+        width:50%;
+        border-radius:5px;
+        border: 3px solid rgba(0, 0, 0, 0.48);
+        line-height:25px;
+        padding-bottom: 20px;
+
+    }
+    .userInfo{
+        padding-top:1px;
+        padding-bottom: 20px;
+        margin-bottom:10px;
+        margin-left: 20%;
+        margin-right:20%;
+        background-color: rgba(0, 0, 0, 0.22);
+
     }
 
-    .userInfo{
-        margin-bottom:10px;
-    }
+
     .taskElement{
         margin-bottom:10px;
     }
@@ -466,6 +480,7 @@
         min-height: 100%;
     }
     .imgInput{
+        margin-top:10px;
         margin-bottom: 10px;
     }
     .uploaded-image{
