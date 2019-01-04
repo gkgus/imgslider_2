@@ -269,28 +269,28 @@
 //이미지 이름에 i,b,q가 들어가면 사전에 시간/키보드 설정.
                     reader.onload = e =>{
                         if(image.name.search('i')>0){
-                            console.log("IMAGE>>"+i);
+                            //console.log("IMAGE>>"+i);
                             tranMethod_str=this.i_tranMethod;
                             if(this.i_tranMethod=='time'){
                                 time_num=this.i_time;
                             }
                         }
                         else if (image.name.search('b')>0){
-                            console.log("BLANK>>"+i)
+                            //console.log("BLANK>>"+i)
                             tranMethod_str=this.b_tranMethod;
                             if(this.b_tranMethod=='time'){
                                 time_num=this.b_time;
                             }
                         }
                         else if( image.name.search('q')>0){
-                            console.log("QUESTION>>"+i)
+                            //console.log("QUESTION>>"+i)
                             tranMethod_str=this.q_tranMethod;
                             if(this.q_tranMethod=='time'){
                                 time_num=this.q_time;
                             }
                         }
                         else{
-                            console.log("Nothing>>+i")
+                           //console.log("Nothing>>+i")
                             tranMethod_str='time';
                         }
 // imgData 구성한 뒤 imgList에 넣어줌.
@@ -301,15 +301,19 @@
                             tranMethod: tranMethod_str,
                             time: time_num
                         };
-
+//imgList[0]에는 이미 데이터가 들어있어서 +1된 값에 저장.
                         this.imgList[i+1]= imgData;
                         //this.imgList.push(imgData);
-                        console.log(imgData);
+                        //console.log(imgData);
                     };
                 }
+//마지막 이미지 추가.
+                /*
                 this.imgList[imglist.target.files.length+1]= {
-                    url:'http://cdn.shopify.com/s/files/1/1711/8411/products/placard_thx_cdf0763b-e1e2-45f0-98af-4c00d72c9180_1024x1024.png?v=1492780365'}
-
+                    tranMethod:'time',
+                    url:'http://cdn.shopify.com/s/files/1/1711/8411/products/placard_thx_cdf0763b-e1e2-45f0-98af-4c00d72c9180_1024x1024.png?v=1492780365'
+                }
+*/
 
             },
 //슬라이드쇼에서 이미지가 전체 화면에 맞도록 화면 크기에따라 변경
@@ -322,7 +326,7 @@
             imgClicked(id){
                 console.log(id);
                 console.log(this.imgList[id+1]);
-                console.log(this.imgList)
+                //console.log(this.imgList)
                 this.clickedImg = id+1;
             },
 
@@ -334,9 +338,11 @@
             }
             ,slideShow(){
                 var thisVue = this;
-//export 될 초기 정보 작성: 유저 정보
+//csv에 저장 될 유저 정보 작성. 슬라이드쇼가 시작되자 마자 작성됨.
+            //키 결과값 용 데이터
                 this.exportKeyData.push({imageName: this.userInfo.name,
                     keyInput: this.userInfo.nameEng});
+            //참여자 정보용 데이터
                 this.exportUserData.push({
                     id: this.userId,
                     name: this.userInfo.name,
@@ -349,7 +355,6 @@
                 slowEach( array,  function( element, index ) {
                     thisVue.currentSlideImg= thisVue.imgList[index].url;
                 });
-
 
                 function slowEach( array, callback ) {
                     if( ! array.length ) return;
@@ -366,17 +371,24 @@
                                     document.body.onkeydown = function(e) {
                                         console.log("KEYPRESSED>>"+e.code);
                                         //KeyO, KeyX, KeyA 값이 필요
+                                        if(e.code=='KeyO'||e.code=='KeyX'||e.code=='KeyA'){
+                                            console.log("Valid Key")
+                                            var keyData={
+                                                imageName: thisVue.imgList[i].name,
+                                                keyInput: e.code[3]
+                                            };
+                                            console.log("KEYVALUE>>>"+e.code[3]);
+                                            thisVue.exportKeyData.push(keyData);
+                                            i+=1;
+                                            setTimeout( next, 1);
+                                        } else{
+                                            console.log("Invalid Key")
+                                        }
 //이미지 이름과 누른 키값을 keyData에 저장
-                                        var keyData={
-                                            imageName: thisVue.imgList[i].name,
-                                            keyInput: e.code
-                                        };
-                                        thisVue.exportKeyData.push(keyData);
-                                        i+=1;
-                                        setTimeout( next, 1);
+
                                     }
 
-
+//tranMethod가 time인 경우
                                 } else if(array[i].tranMethod=='time'){
                                     document.body.onkeydown = function() {
                                         console.log("TIME_KEYPRESSED>>")
@@ -388,7 +400,6 @@
                                 }
 
 
-
                             }
                         }
 
@@ -396,6 +407,9 @@
 
 
                 }
+
+
+
 
             },
 //슬라이드쇼에서 마우스를 클릭하면 나올 수 있도록 설정.
