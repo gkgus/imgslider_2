@@ -10,22 +10,37 @@
         <button v-on:click="slideShowBtn" >슬라이드쇼</button>
         <br>
 
-<!--슬라이드쇼에서 컴포넌트를 통해 이미지 보여줌-->
+        <!--슬라이드쇼에서 컴포넌트를 통해 이미지 보여줌-->
         <div class="slideImg" v-if="slideShowbtnClicked" @click="slideImgClicked()">
             <slideShowImg :width="window.width"
-                            :height="window.height"
-                            :imgsrc="currentSlideImg"
-                            ></slideShowImg>
+                          :height="window.height"
+                          :imgsrc="currentSlideImg"
+            ></slideShowImg>
         </div>
 
         <br>
+    <div class="userInfo">
+        <h3>참여자 정보 입력</h3>
+        <label for="userName">이름: </label>
+        <input type="text" id="userName" placeholder="이름" v-model="userInfo.name">
+        <label for="userNameEng"> 영어 이름: </label>
+        <input type="text" id="userNameEng" placeholder="Name" v-model="userInfo.nameEng">
+        <br>
 
-<!--csv 다운로드 링크-->
+    </div>
+
+        <label for="fileName">파일 이름: </label>
+        <input type="text" id="fileName" placeholder="파일 이름" v-model="fileName">
+
+        <br>
+<!--csv 다운로드-->
+        이미지별 Keyboard 입력값 저장:
         <vue-csv-downloader
-                :data="exportData"
+                :data="exportKeyData"
                 :fields="exportFields"
+                :download-name="fileName"
         >
-            csv download
+           {{fileName}} csv download
         </vue-csv-downloader>
 
 
@@ -159,6 +174,13 @@
         components:{VueCsvDownloader, slideShowImg},
         data(){
             return{
+                userInfo:{
+                    name:"",
+                    nameEng:"",
+                    gender:"",
+                    age:Number
+                },
+                fileName:"",
                 slideShowbtnClicked: false,
                 clickedImg: Number,
                 previewImage:null,
@@ -171,6 +193,7 @@
                 tranMethod: String,
                 selectedImgId:Number,
                 currentSlideImg: "https://images.pexels.com/photos/237018/pexels-photo-237018.jpeg?cs=srgb&dl=asphalt-autumn-beauty-237018.jpg&fm=jpg",
+
                 window: {
                     width: 0,
                     height: 0
@@ -185,10 +208,10 @@
                     }
                 ],
                 exportFields:['imageName','keyInput'],
-                exportData:[
+                exportKeyData:[
                     {
-                        imageName: 'image Number',
-                        keyInput: 'User answer'
+                        imageName: '이미지 이름',
+                        keyInput: '입력한 키보드 값'
                     }
                 ]
 
@@ -278,7 +301,8 @@
             }
             ,slideShow(){
                 var thisVue = this;
-
+                this.exportKeyData.push({imageName: this.userInfo.name,
+                    keyInput: this.userInfo.nameEng});
                 var array = this.imgList;
                 slowEach( array,  function( element, index ) {
                     thisVue.currentSlideImg= thisVue.imgList[index].url;
@@ -298,14 +322,14 @@
                                 if(array[i].tranMethod=='keyboard'){
                                     document.body.onkeydown = function(e) {
                                         console.log("KEYPRESSED>>"+e.code);
-                                        //KeyO, KeyX, KeyA
+                                        //KeyO, KeyX, KeyA 값이 필요
 //이미지 이름과 누른 키값을 keyData에 저장
 
                                         var keyData={
                                             imageName: thisVue.imgList[i].name,
                                             keyInput: e.code
                                         };
-                                        thisVue.exportData.push(keyData);
+                                        thisVue.exportKeyData.push(keyData);
                                         i+=1;
                                         setTimeout( next, 1);
                                     }
@@ -317,7 +341,7 @@
                                     }
                                     console.log("TIME>>"+array[i].time);
                                     i+=1;
-                                    setTimeout( next, array[i].time);
+                                    setTimeout( next, array[i-1].time);
 
                                 }
 
@@ -325,7 +349,10 @@
 
                             }
                         }
+
                     }
+
+
                 }
 
             },
@@ -362,6 +389,9 @@
     input[type="number"] {
         width:50px;
     }
+    input[type="text"]{
+        width:100px;
+    }
     .taskSetting{
         margin-top:10px;
         margin-left: 30%;
@@ -369,6 +399,10 @@
         margin-bottom: 30px;
         border-radius:5px;
         border: 3px solid rgba(0, 0, 0, 0.48);
+    }
+
+    .userInfo{
+        margin-bottom:10px;
     }
     .taskElement{
         margin-bottom:10px;
