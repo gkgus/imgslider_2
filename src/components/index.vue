@@ -282,21 +282,21 @@
                     this.imgList.length= imglist.target.files.length;
 //이미지 이름에 i,b,q가 들어가면 사전에 시간/키보드 설정.
                     reader.onload = e =>{
-                        if(image.name.search('i')>0){
+                        if(image.name.search('_i_')>0){
                             //console.log("IMAGE>>"+i);
                             tranMethod_str=this.i_tranMethod;
                             if(this.i_tranMethod=='time'){
                                 time_num=this.i_time;
                             }
                         }
-                        else if (image.name.search('b')>0){
+                        else if (image.name.search('_b_')>0){
                             //console.log("BLANK>>"+i)
                             tranMethod_str=this.b_tranMethod;
                             if(this.b_tranMethod=='time'){
                                 time_num=this.b_time;
                             }
                         }
-                        else if( image.name.search('q')>0){
+                        else if( image.name.search('_q_')>0){
                             //console.log("QUESTION>>"+i)
                             tranMethod_str=this.q_tranMethod;
                             if(this.q_tranMethod=='time'){
