@@ -20,20 +20,33 @@
         </div>
 
         <br>
-    <div class="userInfo">
-        <h4>참여자 정보 입력</h4>
-        <label for="userName">이름: </label>
-        <input type="text" id="userName" placeholder="이름" v-model="userInfo.name">
-        <label for="userNameEng"> 영어 이름: </label>
-        <input type="text" id="userNameEng" placeholder="Name" v-model="userInfo.nameEng">
-        <label for="userGender"> 성별: </label>
-        <input type="text" id="userGender" placeholder="M/W" v-model="userInfo.gender">
-        <label for="userAge"> 나이: </label>
-        <input type="number" id="userAge" placeholder=0 v-model="userInfo.age"> 대
-        <button @click="userclearBtn">Refresh</button>
-        <br>
+        <div class="userInfo">
+            <h4>참여자 정보 입력</h4>
+            <label for="userName">이름: </label>
+            <input type="text" id="userName" placeholder="이름" v-model="userInfo.name">
+            <label for="userNameEng"> 영어 이름: </label>
+            <input type="text" id="userNameEng" placeholder="Name" v-model="userInfo.nameEng">
+            <label for="userGender"> 성별: </label>
+            <input type="text" id="userGender" placeholder="M/W" v-model="userInfo.gender">
+            <label for="userAge"> 나이: </label>
+            <input type="number" id="userAge" placeholder=0 v-model="userInfo.age"> 대
+            <button @click="userclearBtn">Refresh</button>
+            <br>
 
-    </div>
+        </div>
+
+        <div class="participantList">
+            <h4>참여자 목록</h4>
+                <div v-for="user in exportUserData" :key="user.id">
+                    <div v-if="user.id>=1">
+                            {{user.id}}&nbsp;&nbsp;&nbsp;
+                            {{user.name}}&nbsp;&nbsp;&nbsp;
+                            {{user.nameEng}}&nbsp;&nbsp;&nbsp;
+                            {{user.gender}}&nbsp;&nbsp;&nbsp;
+                            {{user.age}}
+                    </div>
+                </div>
+        </div>
 
         <table class="tableSetting">
             <tbody>
@@ -161,6 +174,7 @@
 
 <!--이미지 미리보기-->
     <div class="showImage">
+        <h4>이미지 리스트</h4>
         <div v-for="item in imgList" class="inline"  :key="item.id" >
             <div v-if="item.id>=0">
                 <div class="imgObj" @click="imgClicked(item.id)">
@@ -479,6 +493,9 @@
 
     }
 
+    .participantList{
+        margin-bottom: 10px;
+    }
 
     .taskElement{
         margin-bottom:10px;
