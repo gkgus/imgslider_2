@@ -18,10 +18,10 @@
                           :imgsrc="currentSlideImg"
             ></slideShowImg>
         </div>
-
         <br>
         <div class="userInfo">
             <h4>참여자 정보 입력</h4>
+            <hr>
             <label for="userName">이름: </label>
             <input type="text" id="userName" placeholder="이름" v-model="userInfo.name">
             <label for="userNameEng"> 영어 이름: </label>
@@ -37,6 +37,7 @@
 
         <div class="participantList">
             <h4>참여자 목록</h4>
+            <hr>
                 <div v-for="user in exportUserData" :key="user.id">
                     <div v-if="user.id>=1">
                             {{user.id}}&nbsp;&nbsp;&nbsp;
@@ -56,6 +57,7 @@
                     <div >
 
                         <h4>이미지 이름별 설정</h4>
+                        <hr>
                         <div class="taskElement">
                             q(질문 이미지):
                             <input type="radio" id="q_time" value="time" v-model="q_tranMethod">
@@ -98,8 +100,9 @@
 
                 </td>
                 <td class="fileInfo">
-                    <div >
+                    <div>
                         <h4>csv 파일 정보</h4>
+                        <hr>
                         <label for="fileName">파일 이름: </label>
                         <input type="text" id="fileName" placeholder="파일 이름" v-model="fileName">
                         <br>
@@ -143,6 +146,7 @@
 <!--이미지 불러오기-->
         <div class="imgInput">
             <h4>이미지 불러오기</h4>
+            <hr>
             <input type="file" multiple accept="image/*" @change=uploadImage>
         </div>
 
@@ -157,7 +161,6 @@
         <br>
         {{imgList[clickedImg].name}}
         <h3>이미지 전환 방식</h3>
-
         <div class="transitionMethod">
             <input type="radio" id="time" value="time" v-model="imgList[clickedImg].tranMethod">
             <label for="time">Time</label>
@@ -175,6 +178,7 @@
 <!--이미지 미리보기-->
     <div class="showImage">
         <h4>이미지 리스트</h4>
+        <hr>
         <div v-for="item in imgList" class="inline"  :key="item.id" >
             <div v-if="item.id>=0">
                 <div class="imgObj" @click="imgClicked(item.id)">
@@ -256,7 +260,7 @@
             }
         },
         created() {
-            window.addEventListener('resize', this.handleResize)
+            window.addEventListener('resize', this.handleResize);
             this.handleResize();
         },
 
@@ -435,9 +439,17 @@
 </script>
 
 <style scoped>
-
+    hr{
+        width: 150px;
+        margin-bottom: 15px;
+    }
+    h4{
+        margin-bottom: 5px;
+    }
     .showImage{
         width:60%;
+        margin-top: 50px;
+        margin-bottom: 150px;
     }
     .imgSetting{
         position:sticky;
@@ -494,7 +506,13 @@
     }
 
     .participantList{
+        padding-bottom: 20px;
         margin-bottom: 10px;
+        margin-left: 20%;
+        margin-right:20%;
+        border-radius:5px;
+        border: 3px solid rgba(0, 0, 0, 0.48);
+
     }
 
     .taskElement{
@@ -510,7 +528,7 @@
         min-height: 100%;
     }
     .imgInput{
-        margin-top:10px;
+        margin-top:40px;
         margin-bottom: 10px;
     }
     .uploaded-image{
