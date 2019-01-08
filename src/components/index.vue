@@ -445,7 +445,13 @@
     }
     html,body{
         height:100%;
+
     }
+
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
     input[type="number"] {
         width:50px;
     }
@@ -500,6 +506,7 @@
         /* Preserve aspet ratio */
         min-width: 100%;
         min-height: 100%;
+
     }
     .imgInput{
         margin-top:40px;
