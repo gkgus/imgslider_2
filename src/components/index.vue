@@ -3,7 +3,7 @@
         <h1>Image Slider</h1>
 
         <!--슬라이드쇼 시작-->
-        <button v-on:click="slideShowBtn" >슬라이드쇼</button>
+        <button v-on:click="slideShowBtn" :disabled="slideShowbtnClicked" >슬라이드쇼</button>
         <br>
 
         <!--슬라이드쇼에서 컴포넌트를 통해 이미지 보여줌-->
