@@ -13,7 +13,6 @@
             height: Number,
             imgsrc: String
         }
-
     }
 </script>
 
