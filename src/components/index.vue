@@ -249,8 +249,19 @@
         created() {
             window.addEventListener('resize', this.handleResize);
             this.handleResize();
+            //document.documentElement.style.overflow = 'hidden'
         },
+        watch:{
 
+            slideShowbtnClicked:function () {
+                if(this.slideShowbtnClicked){
+                    document.documentElement.style.overflow = 'hidden'
+                }
+                else{
+                    document.documentElement.style.overflow = 'auto'
+                }
+            }
+        },
         methods:{
             userclearBtn(){
                 this.userInfo={
@@ -425,6 +436,9 @@
     h4{
         margin-bottom: 5px;
     }
+
+
+
     .showImage{
         width:60%;
         margin-top: 50px;
@@ -444,9 +458,13 @@
     .transitionMethod{
 
     }
-    html,body{
+    html{
         height:100%;
+    }
 
+    body{
+        height:100%;
+        overflow:hidden;
     }
 
 
