@@ -270,6 +270,16 @@
                     gender:"",
                     age:Number
                 }
+
+                this.exportUserData=[
+                    {
+                        id:"순서",
+                        name: "이름",
+                        nameEng: "영문 이름",
+                        gender:"성별",
+                        age:"나이"
+                    }
+                ]
             },
             saveBtn(){
                 this.imgList[this.clickedImg].tranMethod= this.tranMethod;
