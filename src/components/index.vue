@@ -271,13 +271,10 @@
                     age:Number
                 }
 
-                this.exportUserData=[
+                this.exportKeyData=[
                     {
-                        id:"순서",
-                        name: "이름",
-                        nameEng: "영문 이름",
-                        gender:"성별",
-                        age:"나이"
+                        imageName: '이미지 이름',
+                        keyInput: '입력한 키보드 값'
                     }
                 ]
             },
