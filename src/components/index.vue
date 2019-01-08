@@ -417,6 +417,7 @@
 </script>
 
 <style scoped>
+
     hr{
         width: 150px;
         margin-bottom: 15px;
@@ -448,9 +449,7 @@
 
     }
 
-    ::-webkit-scrollbar {
-        display: none;
-    }
+
 
     input[type="number"] {
         width:50px;
