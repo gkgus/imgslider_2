@@ -25,7 +25,7 @@
             <input type="text" id="userGender" placeholder="M/W" v-model="userInfo.gender">
             <label for="userAge"> 나이: </label>
             <input type="number" id="userAge" placeholder=0 v-model="userInfo.age"> 대
-            <button @click="userclearBtn">Refresh</button>
+            <button @click="userclearBtn">KeyResult csv 파일 생성</button>
             <br>
 
         </div>
@@ -41,7 +41,15 @@
                     {{user.nameEng}}&nbsp;&nbsp;&nbsp;
                     {{user.gender}}&nbsp;&nbsp;&nbsp;
                     {{user.age}}
+                    <vue-csv-downloader
+                            :data="exportuserKeyList[user.id]"
+                            :fields="exportKeyFields"
+                            :download-name="user.name+'_keyResult.csv'"
+                    >
+                        {{user.name+'_keyResult'}} .csv
+                    </vue-csv-downloader>
                 </div>
+
             </div>
         </div>
 
@@ -102,19 +110,8 @@
                         <label for="fileName">파일 이름: </label>
                         <input type="text" id="fileName" placeholder="파일 이름" v-model="fileName">
                         <br>
-                        <br>
 
                         <!--csv 다운로드-->
-                        이미지별 Keyboard 입력값 저장:
-                        <br>
-                        <vue-csv-downloader
-                                :data="exportKeyData"
-                                :fields="exportKeyFields"
-                                :download-name="fileName+'_keyResult.csv'"
-                        >
-                            {{fileName+'_keyResult'}} .csv
-                        </vue-csv-downloader>
-                        <br>
                         <br>
                         참여자 목록 저장:
                         <br>
@@ -232,6 +229,16 @@
                         keyInput: '입력한 키보드 값'
                     }
                 ],
+                exportuserKeyList:[
+                    [
+                        {
+                            imageName: '이미지 이름',
+                            keyInput: '입력한 키보드 값'
+                        }
+                    ]
+                ]
+
+                ,
                 userId:1,
                 exportUserFields:['id','name','nameEng','gender','age'],
                 exportUserData:[
@@ -270,13 +277,14 @@
                     gender:"",
                     age:Number
                 }
-
+                this.exportuserKeyList.push(this.exportKeyData);
                 this.exportKeyData=[
                     {
                         imageName: '이미지 이름',
                         keyInput: '입력한 키보드 값'
                     }
                 ]
+
             },
             saveBtn(){
                 this.imgList[this.clickedImg].tranMethod= this.tranMethod;
@@ -400,6 +408,7 @@
                                             console.log("Valid Key")
                                             var keyData={
                                                 imageName: thisVue.imgList[i].name,
+
                                                 keyInput: e.code[3]
                                             };
                                             console.log("KEYVALUE>>>"+e.code[3]);
