@@ -419,6 +419,7 @@
                 function slowEach( array, callback ) {
                     if( ! array.length ) return;
                     var i = 1;
+                    var keyStr = '';
                     next();
                     function next() {
 //다음 슬라이드가 마지막이거나, 슬라이드쇼에서 클릭을 했을때(slideShowbtnClicked==false일 경우)
@@ -433,11 +434,12 @@
                                         //KeyO, KeyX, KeyA 값이 필요
                                         if(e.code=='KeyO'||e.code=='KeyX'||e.code=='KeyA'||e.code=='Space'){
                                             console.log("Valid Key")
+
                                             var keyData={
                                                 imageName: thisVue.imgList[i].name,
-                                                keyInput: e.code[3]
+                                                keyInput: e.code.replace('Key','')
                                             };
-                                            console.log("KEYVALUE>>>"+e.code[3]);
+                                            console.log("KEYVALUE>>>"+e.code.replace('Key',''));
                                             thisVue.exportKeyData.push(keyData);
                                             i+=1;
                                             setTimeout( next, 1);
