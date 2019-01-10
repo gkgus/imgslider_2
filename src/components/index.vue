@@ -21,14 +21,6 @@
             <hr>
             <label for="userName">이름: </label>
             <input type="text" id="userName" placeholder="이름" v-model="userInfo.name">&nbsp;
-            <!--
-            <label for="userNameEng"> 영어 이름: </label>
-            <input type="text" id="userNameEng" placeholder="Name" v-model="userInfo.nameEng">
-            <label for="userGender"> 성별: </label>
-            <input type="text" id="userGender" placeholder="M/W" v-model="userInfo.gender">
-            <label for="userAge"> 나이: </label>
-            <input type="number" id="userAge" placeholder=0 v-model="userInfo.age"> 대 &nbsp;
-            -->
             <button @click="userclearBtn" :disabled="!csvExportBtn">KeyResult csv 파일 생성</button>
             <br>
 
@@ -37,15 +29,11 @@
         <div class="participantList">
             <h4>참여자 목록</h4>
             <hr>
-            <!-- &nbsp; &nbsp;  번호 &nbsp;&nbsp;&nbsp; 이름 &nbsp;&nbsp;&nbsp; 영어이름 &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; 성별 &nbsp;나이 &nbsp;&nbsp;&nbsp;-->
             <div v-for="user in exportUserData" :key="user.id">
                 <div v-if="user.id>=1">
                     {{user.id}}&nbsp;&nbsp;&nbsp;
                     {{user.name}}&nbsp;&nbsp;&nbsp;
-                    <!--
-                    {{user.nameEng}}&nbsp;&nbsp;&nbsp;
-                    {{user.gender}}&nbsp;&nbsp;&nbsp;
-                    {{user.age}}  &nbsp;-->
+
                     <vue-csv-downloader
                             :data="exportuserKeyList[user.id]"
                             :fields="exportKeyFields"
@@ -102,11 +90,8 @@
                                 <input type="number" v-model="i_time"> 초
                             </div>
                         </div>
-
                         <br>
-
                     </div>
-
                 </td>
                 <td class="fileInfo">
                     <div>
@@ -252,10 +237,6 @@
                     {
                         id:"순서",
                         name: "이름",
-                        /*
-                        nameEng: "영문 이름",
-                        gender:"성별",
-                        age:"나이"*/
                     }
                 ]
 
@@ -353,8 +334,6 @@
                         };
 //imgList[0]에는 이미 데이터가 들어있어서 +1된 값에 저장.
                         this.imgList[i+1]= imgData;
-                        //this.imgList.push(imgData);
-                        //console.log(imgData);
                     };
                 }
 //마지막 이미지 추가.
@@ -404,11 +383,6 @@
                 this.exportUserData.push({
                     id: this.userId,
                     name: this.userInfo.name
-                    /*
-                    nameEng: this.userInfo.nameEng,
-                    gender: this.userInfo.gender,
-                    age: this.userInfo.age
-                    */
                 });
                 this.userId= this.userId+1;
                 var array = this.imgList;
