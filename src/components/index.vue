@@ -20,13 +20,15 @@
             <h4>참여자 정보 입력</h4>
             <hr>
             <label for="userName">이름: </label>
-            <input type="text" id="userName" placeholder="이름" v-model="userInfo.name">
+            <input type="text" id="userName" placeholder="이름" v-model="userInfo.name">&nbsp;
+            <!--
             <label for="userNameEng"> 영어 이름: </label>
             <input type="text" id="userNameEng" placeholder="Name" v-model="userInfo.nameEng">
             <label for="userGender"> 성별: </label>
             <input type="text" id="userGender" placeholder="M/W" v-model="userInfo.gender">
             <label for="userAge"> 나이: </label>
             <input type="number" id="userAge" placeholder=0 v-model="userInfo.age"> 대 &nbsp;
+            -->
             <button @click="userclearBtn" :disabled="!csvExportBtn">KeyResult csv 파일 생성</button>
             <br>
 
@@ -40,15 +42,16 @@
                 <div v-if="user.id>=1">
                     {{user.id}}&nbsp;&nbsp;&nbsp;
                     {{user.name}}&nbsp;&nbsp;&nbsp;
+                    <!--
                     {{user.nameEng}}&nbsp;&nbsp;&nbsp;
                     {{user.gender}}&nbsp;&nbsp;&nbsp;
-                    {{user.age}}  &nbsp;
+                    {{user.age}}  &nbsp;-->
                     <vue-csv-downloader
                             :data="exportuserKeyList[user.id]"
                             :fields="exportKeyFields"
-                            :download-name="user.name+'_keyResult.csv'"
+                            :download-name="user.id+'_'+user.name+'_keyResult.csv'"
                     >
-                        {{user.name+'_keyResult'}} .csv
+                        {{user.id+'_'+user.name+'_keyResult'}} .csv
                     </vue-csv-downloader>
                 </div>
 
@@ -249,9 +252,10 @@
                     {
                         id:"순서",
                         name: "이름",
+                        /*
                         nameEng: "영문 이름",
                         gender:"성별",
-                        age:"나이"
+                        age:"나이"*/
                     }
                 ]
 
@@ -330,10 +334,14 @@
                             if(this.q_tranMethod=='time'){
                                 time_num=this.q_time;
                             }
+
                         }
                         else{
                             //console.log("Nothing>>+i")
                             tranMethod_str='time';
+                        }
+                        if(i==0){
+                            tranMethod_str='keyboard';
                         }
 // imgData 구성한 뒤 imgList에 넣어줌.
                         var imgData = {
@@ -390,15 +398,17 @@
                         keyInput: '입력한 키보드 값'
                     }
                 ];
-                this.exportKeyData.push({imageName: this.userInfo.name,
-                    keyInput: this.userInfo.nameEng});
+                this.exportKeyData.push({imageName: this.userId,
+                    keyInput: this.userInfo.name});
                 //참여자 정보용 데이터
                 this.exportUserData.push({
                     id: this.userId,
-                    name: this.userInfo.name,
+                    name: this.userInfo.name
+                    /*
                     nameEng: this.userInfo.nameEng,
                     gender: this.userInfo.gender,
                     age: this.userInfo.age
+                    */
                 });
                 this.userId= this.userId+1;
                 var array = this.imgList;
@@ -421,7 +431,7 @@
                                     document.body.onkeydown = function(e) {
                                         console.log("KEYPRESSED>>"+e.code);
                                         //KeyO, KeyX, KeyA 값이 필요
-                                        if(e.code=='KeyO'||e.code=='KeyX'||e.code=='KeyA'){
+                                        if(e.code=='KeyO'||e.code=='KeyX'||e.code=='KeyA'||e.code=='Space'){
                                             console.log("Valid Key")
                                             var keyData={
                                                 imageName: thisVue.imgList[i].name,
