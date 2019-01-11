@@ -21,11 +21,9 @@
             <hr>
             <label for="userName">이름: </label>
             <input type="text" id="userName" placeholder="이름" v-model="userInfo.name">&nbsp;
-            <button @click="userclearBtn" :disabled="!csvExportBtn">KeyResult csv 파일 생성</button>
+            <button @click="ExportBtn" :disabled="!csvExportBtn">KeyResult csv 파일 생성</button>
             <br>
-
         </div>
-
         <div class="participantList">
             <h4>참여자 목록</h4>
             <hr>
@@ -35,8 +33,8 @@
                     {{user.name}}&nbsp;&nbsp;&nbsp;
 
                     <vue-csv-downloader
-                            :data="exportuserKeyList[user.id]"
-                            :fields="exportKeyFields"
+                            :data="exportDataList[user.id]"
+                            :fields="exportDataFields"
                             :download-name="user.id+'_'+user.name+'_keyResult.csv'"
                     >
                         {{user.id+'_'+user.name+'_keyResult'}} .csv
@@ -52,7 +50,6 @@
                 <td class="taskSetting">
                     <!--이미지 이름에 i,b,q가 들어가면 사전에 시간/키보드 설정.-->
                     <div>
-
                         <h4>이미지 이름별 설정</h4>
                         <hr>
                         <div class="taskElement">
@@ -100,7 +97,6 @@
                         <label for="fileName">파일 이름: </label>
                         <input type="text" id="fileName" placeholder="파일 이름" v-model="fileName">
                         <br>
-
                         <!--csv 다운로드-->
                         <br>
                         참여자 목록 저장:
@@ -112,10 +108,8 @@
                         >
                             {{fileName+'_participant'}} .csv
                         </vue-csv-downloader>
-
                     </div>
                     <br>
-
                 </td>
             </tr>
             </tbody>
@@ -131,12 +125,11 @@
         <section>
             <div class="imgSetting"  v-if="clickedImg>=1">
                 <!--이미지 개별 전환 방식 -->
-
                 <h3>이미지 전환 방식</h3>
                 {{imgList[clickedImg].name}}
                 <br>
                 <br>
-                <div class="transitionMethod">
+                <div>
                     <input type="radio" id="time" value="time" v-model="tranMethod">
                     <label for="time">Time</label>
                     <br>
@@ -211,34 +204,43 @@
                         name: String,
                         url: String,
                         tranMethod: String,
-                        time: Number
+                        time: Number,
+                        isImg: Boolean
                     }
                 ],
-                exportKeyFields:['imageName','keyInput'],
-                exportKeyData:[
+                exportDataFields:['imageName','keyInput','startTime','endTime'],
+                exportData:[
                     {
                         imageName: '이미지 이름',
-                        keyInput: '입력한 키보드 값'
+                        keyInput: '입력한 키보드 값',
+                        startTime: '이미지 시작지점',
+                        endTime: '이미지 끝나는 지점'
                     }
                 ],
-                exportuserKeyList:[
+                exportDataList:[
                     [
                         {
                             imageName: '이미지 이름',
-                            keyInput: '입력한 키보드 값'
+                            keyInput: '입력한 키보드 값',
+                            startTime: '이미지 시작지점',
+                            endTime: '이미지 끝나는 지점'
                         }
                     ]
                 ]
 
                 ,
                 userId:1,
-                exportUserFields:['id','name','nameEng','gender','age'],
+                exportUserFields:['id','name'],
                 exportUserData:[
                     {
                         id:"순서",
                         name: "이름",
                     }
-                ]
+                ],
+
+                timer:null,
+                seconds: 0,
+
 
             }
         },
@@ -259,7 +261,9 @@
             }
         },
         methods:{
-            userclearBtn(){
+
+        //csv Export 하는 버튼
+            ExportBtn(){
                 this.userInfo={
                     name:"",
                     nameEng:"",
@@ -267,14 +271,16 @@
                     age:Number
                 }
                 this.csvExportBtn=false;
-                if(this.exportKeyData[this.exportKeyData.length-1].imageName=='end'){
-                    this.exportKeyData[this.exportKeyData.length-1]=''
+                if(this.exportData[this.exportData.length-1].imageName=='end'){
+                    this.exportData[this.exportData.length-1]=''
                 }
-                this.exportuserKeyList.push(this.exportKeyData);
-                this.exportKeyData=[
+                this.exportDataList.push(this.exportData);
+                this.exportData=[
                     {
                         imageName: '이미지 이름',
-                        keyInput: '입력한 키보드 값'
+                        keyInput: '입력한 키보드 값',
+                        startTime: '이미지 시작지점',
+                        endTime: '이미지 끝나는 지점'
                     }
                 ]
 
@@ -285,6 +291,15 @@
 //이미지 불러오기
             uploadImage(imglist){
                 this.slideShowbtnvalid=true;
+
+                this.imgList[1]={
+                    id: 0,
+                    name: 'StartScreen',
+                    url:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABIAAAAKICAIAAACHSRZaAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAA25SURBVHhe7dcxDQAwDMCwAelZ/szKYSxyWTIJv5sFAAAgIGAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAAJGY/GFZc7Ay6vRoAAAAASUVORK5CYII="
+                    ,tranMethod: 'keyboard',
+                    time: 1
+                };
+
                 for(let i=0;i<imglist.target.files.length;i++){
                     const reader = new FileReader();
                     const image = imglist.target.files[i];
@@ -292,12 +307,14 @@
 
                     var tranMethod_str = 'time';
                     var time_num = 2;
+                    var isImg_Bool = false;
                     this.imgList.length= imglist.target.files.length;
 //이미지 이름에 i,b,q가 들어가면 사전에 시간/키보드 설정.
                     reader.onload = e =>{
                         if(image.name.search('_i_')>0){
                             //console.log("IMAGE>>"+i);
                             tranMethod_str=this.i_tranMethod;
+                            isImg_Bool=true;
                             if(this.i_tranMethod=='time'){
                                 time_num=this.i_time;
                             }
@@ -305,6 +322,7 @@
                         else if (image.name.search('_b_')>0){
                             //console.log("BLANK>>"+i)
                             tranMethod_str=this.b_tranMethod;
+                            isImg_Bool=false;
                             if(this.b_tranMethod=='time'){
                                 time_num=this.b_time;
                             }
@@ -312,6 +330,7 @@
                         else if( image.name.search('_q_')>0){
                             //console.log("QUESTION>>"+i)
                             tranMethod_str=this.q_tranMethod;
+                            isImg_Bool=false;
                             if(this.q_tranMethod=='time'){
                                 time_num=this.q_time;
                             }
@@ -321,27 +340,26 @@
                             //console.log("Nothing>>+i")
                             tranMethod_str='time';
                         }
-                        if(i==0){
-                            tranMethod_str='keyboard';
-                        }
+
 // imgData 구성한 뒤 imgList에 넣어줌.
                         var imgData = {
-                            id: i,
+                            id: i+1,
                             name: image.name,
                             url: e.target.result,
                             tranMethod: tranMethod_str,
-                            time: time_num
+                            time: time_num,
+                            isImg: isImg_Bool
                         };
 //imgList[0]에는 이미 데이터가 들어있어서 +1된 값에 저장.
-                        this.imgList[i+1]= imgData;
+                        this.imgList[i+2]= imgData;
                     };
                 }
 //마지막 이미지 추가.
 
-                this.imgList[imglist.target.files.length+1]= {
+                this.imgList[imglist.target.files.length+2]= {
                     tranMethod:'time',
                     name:'end',
-                    url:"data:image/png;base64,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GADbnDCD45SIA4CKAANgmxNmcAgwAC5FgAGwyyntdMYuGgBUBBgAu5zSTgIMgCsRYABscs74DAEGwJUIMAA2OSedDqsYggjAkxNgAOxxzgbYOasAQESAAbDHORtgAgyASxFgAGxxUjkdl3EEDIAnJ8AA2OKk4RlmcABwKQIMgB2O4fT7XwcFGACXIsAAeNCxgZ6XOgNgPwEGwIMEGAB8lwAD4EECDAC+S4AB8CABBgDfJcAAAAAiAgwAACAiwAAAACICDAAAICLAAAAAIgIMAAAgIsAAAAAiAgyAQf0dYW77AuCZCTAABgkwAFgJMAAGCTAAWAkwAAYJMABYCTAABh0C7PX98/4YAP4oAQbAIAEGACsBBsAgAQYAKwEGwCABBgArAQbAIAEGACsBBsAgAQYAKwEGwKBDgI1TeAA8OwEGwCABBgArAQbAIAEGACsBBsAgAQYAKwEGwCBDOABgJcAAGCTAAGAlwAAYJMAAYCXAABgkwABgJcAAGCTAAGAlwAAYJMAAYCXAABgkwABgJcAAGHQIsMbbx/3bAPB8BBgAgwQYAKwEGACDBBgArAQYAIMEGACsBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABARIABAABEBBgAAEBEgAEAAEQEGAAAQESAAQAARAQYAABA4nb7B/3Mxmw8vksKAAAAAElFTkSuQmCC"
+                    url:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABIAAAAKICAIAAACHSRZaAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAA25SURBVHhe7dcxDQAwDMCwAelZ/szKYSxyWTIJv5sFAAAgIGAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAARAQMAAAgImAAAAARAQMAAIgIGAAAQETAAAAAIgIGAAAQETAAAICIgAEAAEQEDAAAICJgAAAAEQEDAACICBgAAEBEwAAAACICBgAAEBEwAACAiIABAABEBAwAACAiYAAAABEBAwAAiAgYAABARMAAAAAiAgYAABARMAAAgIiAAQAAJGY/GFZc7Ay6vRoAAAAASUVORK5CYII="
                 }
 
 
@@ -354,9 +372,9 @@
 
 //이미지를 클릭하면 값이 나옴, 이미지 각각의 값을 조정할 때
             imgClicked(id){
-                console.log(id);
-                console.log(this.imgList[id+1]);
-                //console.log(this.imgList)
+                //console.log(id);
+                //console.log(this.imgList[id+1]);
+                console.log(this.imgList)
                 this.clickedImg = id+1;
                 this.tranMethod=this.imgList[id+1].tranMethod;
             },
@@ -368,17 +386,19 @@
                 this.slideShow();
             }
             ,slideShow(){
+
                 var thisVue = this;
 //csv에 저장 될 유저 정보 작성. 슬라이드쇼가 시작되자 마자 작성됨.
                 //키 결과값 용 데이터
-                this.exportKeyData=[
+                this.exportData=[
                     {
                         imageName: '이미지 이름',
                         keyInput: '입력한 키보드 값'
                     }
                 ];
-                this.exportKeyData.push({imageName: this.userId,
-                    keyInput: this.userInfo.name});
+                /*
+                this.exportData.push({imageName: this.userId,
+                    keyInput: this.userInfo.name});*/
                 //참여자 정보용 데이터
                 this.exportUserData.push({
                     id: this.userId,
@@ -386,40 +406,83 @@
                 });
                 this.userId= this.userId+1;
                 var array = this.imgList;
+
                 slowEach( array,  function( element, index ) {
                     thisVue.currentSlideImg= thisVue.imgList[index].url;
+                    console.log("Current Index>>>>"+index);
+                    console.log("TIME>>"+thisVue.seconds);
+                    //시작하는 슬라이드. 시간값 초기화. setInterval로 시작.
+                    if(index==2){
+                        console.log("Slide Start");
+                        thisVue.timer= setInterval(add,1);
+                        thisVue.seconds=0;
+                    }
+
+
+                    //끝나는 슬라이드, clearInterval, 시간값 초기화
+                    if(index>=thisVue.imgList.length-1){
+                        console.log("Slide End");
+                        console.log(thisVue.seconds);
+                        clearInterval(thisVue.timer);
+                        thisVue.seconds=0;
+                    }
                 });
+
+                function add() {
+                    thisVue.seconds+=1;
+                }
 
                 function slowEach( array, callback ) {
                     if( ! array.length ) return;
+
                     var i = 1;
+                    var startTime, endTime;
+
                     next();
                     function next() {
 //다음 슬라이드가 마지막이거나, 슬라이드쇼에서 클릭을 했을때(slideShowbtnClicked==false일 경우)
                         if( callback( array[i], i ) !== false && thisVue.slideShowbtnClicked ) {
                             if( i+1 < array.length ) {
-                                console.log("number>>"+i);
-                                console.log("METHOD>>"+array[i].tranMethod);
+                                //console.log("number>>"+i);
+                                //console.log("METHOD>>"+array[i].tranMethod);
+//Time 설정. 이미지에서만 시간을 저장할 수 있도록
+                                if(thisVue.imgList[i].isImg){
+                                    startTime= thisVue.seconds;
+
+                                } else{
+                                    startTime='';
+                                }
+
+
 //tranMethod가 keyboard인 경우
                                 if(array[i].tranMethod=='keyboard'){
                                     document.body.onkeydown = function(e) {
-                                        console.log("KEYPRESSED>>"+e.code);
+                                        //console.log("KEYPRESSED>>"+e.code);
                                         //KeyO, KeyX, KeyA 값이 필요
                                         if(e.code=='KeyO'||e.code=='KeyX'||e.code=='KeyA'||e.code=='Space'){
-                                            console.log("Valid Key")
+                                           // console.log("Valid Key")
+                                            //키를 누르는 순간 이미지가 끝나는 시간 저장.
+                                            if(thisVue.imgList[i].isImg){
+                                                endTime= thisVue.seconds;
+                                            } else{
+                                                endTime='';
+                                            }
 
                                             var keyData={
                                                 imageName: thisVue.imgList[i].name,
-                                                keyInput: e.code.replace('Key','')
+                                                keyInput: e.code.replace('Key',''),
+                                                startTime: startTime,
+                                                endTime: endTime
+
                                             };
-                                            console.log("KEYVALUE>>>"+e.code.replace('Key',''));
+                                           // console.log("KEYVALUE>>>"+e.code.replace('Key',''));
                                             if(i>1){
-                                                thisVue.exportKeyData.push(keyData);
+                                                thisVue.exportData.push(keyData);
                                             }
                                             i+=1;
                                             setTimeout( next, 1);
                                         } else{
-                                            console.log("Invalid Key")
+                                           // console.log("Invalid Key")
                                         }
 //이미지 이름과 누른 키값을 keyData에 저장
 
@@ -427,9 +490,9 @@
 //tranMethod가 time인 경우
                                 } else if(array[i].tranMethod=='time'){
                                     document.body.onkeydown = function() {
-                                        console.log("TIME_KEYPRESSED>>")
+                                        //console.log("TIME_KEYPRESSED>>")
                                     }
-                                    console.log("TIME>>"+array[i].time);
+                                    //console.log("TIME>>"+array[i].time);
                                     i+=1;
                                     setTimeout( next, array[i-1].time*1000);
                                 }
@@ -455,9 +518,6 @@
     h4{
         margin-bottom: 5px;
     }
-
-
-
     .showImage{
         width:60%;
         margin-top: 50px;
@@ -474,9 +534,6 @@
         margin-right: 10%;
         padding: 10px;
     }
-    .transitionMethod{
-
-    }
     html{
         height:100%;
     }
@@ -485,8 +542,6 @@
         height:100%;
         overflow:hidden;
     }
-
-
 
     input[type="number"] {
         width:50px;
