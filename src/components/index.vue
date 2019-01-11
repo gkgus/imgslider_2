@@ -374,7 +374,7 @@
             imgClicked(id){
                 //console.log(id);
                 //console.log(this.imgList[id+1]);
-                console.log(this.imgList)
+                //console.log(this.imgList)
                 this.clickedImg = id+1;
                 this.tranMethod=this.imgList[id+1].tranMethod;
             },
@@ -432,6 +432,10 @@
                     thisVue.seconds+=1;
                 }
 
+                function timeTransition(sec){
+                    return sec/250.0;
+                }
+
                 function slowEach( array, callback ) {
                     if( ! array.length ) return;
 
@@ -447,7 +451,7 @@
                                 //console.log("METHOD>>"+array[i].tranMethod);
 //Time 설정. 이미지에서만 시간을 저장할 수 있도록
                                 if(thisVue.imgList[i].isImg){
-                                    startTime= thisVue.seconds;
+                                    startTime= timeTransition(thisVue.seconds);
 
                                 } else{
                                     startTime='';
@@ -463,7 +467,7 @@
                                            // console.log("Valid Key")
                                             //키를 누르는 순간 이미지가 끝나는 시간 저장.
                                             if(thisVue.imgList[i].isImg){
-                                                endTime= thisVue.seconds;
+                                                endTime= timeTransition(thisVue.seconds);
                                             } else{
                                                 endTime='';
                                             }
