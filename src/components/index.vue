@@ -421,10 +421,6 @@
                         thisVue.seconds=0;
                     }
 
-                    if(index>=3&&thisVue.imgList[index-1].isImg){
-                        console.log("BEFORE>>>>>>"+ thisVue.exportData.pop().imageName)
-                    }
-
                     //끝나는 슬라이드, clearInterval, 시간값 초기화
                     if(index>=thisVue.imgList.length-1){
                         console.log("Slide End");
@@ -458,7 +454,6 @@
 //Time 설정. 이미지에서만 시간을 저장할 수 있도록
                                 if(thisVue.imgList[i].isImg){
                                     startTime= timeTransition(thisVue.seconds);
-
                                 } else{
                                     startTime='';
                                 }
