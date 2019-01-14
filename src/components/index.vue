@@ -412,14 +412,19 @@
 
                 slowEach( array,  function( element, index ) {
                     thisVue.currentSlideImg= thisVue.imgList[index].url;
-                    console.log("Current Index>>>>"+index);
-                    console.log("TIME>>"+thisVue.seconds);
+
                     //시작하는 슬라이드. 시간값 초기화. setInterval로 시작.
+                    if(index==1){
+                        clearInterval(thisVue.timer);
+                        thisVue.seconds=0;
+                    }
                     if(index==2){
                         console.log("Slide Start");
                         thisVue.timer= setInterval(add,1);
-                        thisVue.seconds=0;
                     }
+
+                    console.log("Current Index>>>>"+index);
+                    console.log("TIME>>"+thisVue.seconds);
 
                     //끝나는 슬라이드, clearInterval, 시간값 초기화
                     if(index>=thisVue.imgList.length-1){
@@ -452,12 +457,15 @@
                                 //console.log("number>>"+i);
                                 //console.log("METHOD>>"+array[i].tranMethod);
 //Time 설정. 이미지에서만 시간을 저장할 수 있도록
+                                startTime= timeTransition(thisVue.seconds);
+
+                                /*
                                 if(thisVue.imgList[i].isImg){
                                     startTime= timeTransition(thisVue.seconds);
                                 } else{
                                     startTime='';
                                 }
-
+*/
 
 //tranMethod가 keyboard인 경우
                                 if(array[i].tranMethod=='keyboard'){
@@ -469,13 +477,14 @@
 
                                             //키를 누르는 순간 이미지가 끝나는 시간 저장.
                                             //imgList[i]가 이미지 이면 기록
-
+                                            endTime= timeTransition(thisVue.seconds);
+/*
                                             if(thisVue.imgList[i].isImg){
                                                 endTime= timeTransition(thisVue.seconds);
                                             } else{
                                                 endTime='';
                                             }
-
+*/
                                             let keyData={
                                                 imageName: thisVue.imgList[i].name,
                                                 keyInput: e.code.replace('Key',''),
@@ -488,7 +497,7 @@
                                                 thisVue.exportData.push(keyData);
                                             }
                                             i+=1;
-                                            setTimeout( next, 1);
+                                            next();
                                         } else{
                                            // console.log("Invalid Key")
                                         }
@@ -503,24 +512,26 @@
                                     //console.log("TIME>>"+array[i].time);
 
                                     setTimeout( ()=>{
+
                                         //imgList[i]가 이미지 이면 기록
+                                        console.log()
                                         if(thisVue.imgList[i].isImg){
                                             endTime= timeTransition(thisVue.seconds);
+                                            let keyData={
+                                                imageName: thisVue.imgList[i].name,
+                                                keyInput: '',
+                                                startTime: startTime,
+                                                endTime: endTime
+                                            };
+                                            thisVue.exportData.push(keyData);
                                         } else{
                                             endTime='';
                                         }
-                                        let keyData={
-                                            imageName: thisVue.imgList[i].name,
-                                            keyInput: '',
-                                            startTime: startTime,
-                                            endTime: endTime
-                                        };
+
                                         // console.log("KEYVALUE>>>"+e.code.replace('Key',''));
-                                        if(i>1){
-                                            thisVue.exportData.push(keyData);
-                                        }
                                         i+=1;
-                                    }, array[i-1].time*1000);
+                                        next();
+                                    }, array[i].time*1000);
 
 
                                 }
