@@ -167,6 +167,7 @@
     /* eslint-disable no-console */
     import slideShowImg from './slideShowImg.vue'
     import VueCsvDownloader from 'vue-csv-downloader';
+
     export default {
         name: "imgUpload",
         components:{VueCsvDownloader, slideShowImg},
@@ -214,7 +215,8 @@
                         imageName: '이미지 이름',
                         keyInput: '입력한 키보드 값',
                         startTime: '이미지 시작지점',
-                        endTime: '이미지 끝나는 지점'
+                        endTime: '이미지 끝나는 지점',
+
                     }
                 ],
                 exportDataList:[
@@ -223,7 +225,8 @@
                             imageName: '이미지 이름',
                             keyInput: '입력한 키보드 값',
                             startTime: '이미지 시작지점',
-                            endTime: '이미지 끝나는 지점'
+                            endTime: '이미지 끝나는 지점',
+
                         }
                     ]
                 ]
@@ -238,8 +241,8 @@
                     }
                 ],
 
-                timer:null,
-                seconds: 0,
+
+
 
 
             }
@@ -280,7 +283,7 @@
                         imageName: '이미지 이름',
                         keyInput: '입력한 키보드 값',
                         startTime: '이미지 시작지점',
-                        endTime: '이미지 끝나는 지점'
+                        endTime: '이미지 끝나는 지점',
                     }
                 ]
 
@@ -387,8 +390,10 @@
                 this.slideShow();
             }
             ,slideShow(){
-
                 var thisVue = this;
+                var timeBegin;
+                var elapsedTime;
+
 //csv에 저장 될 유저 정보 작성. 슬라이드쇼가 시작되자 마자 작성됨.
                 //키 결과값 용 데이터
                 this.exportData=[
@@ -396,7 +401,8 @@
                         imageName: '이미지 이름',
                         keyInput: '입력한 키보드 값',
                         startTime: '이미지 시작지점',
-                        endTime: '이미지 끝나는 지점'
+                        endTime: '이미지 끝나는 지점',
+
                     }
                 ];
                 /*
@@ -415,44 +421,42 @@
 
                     //시작하는 슬라이드. 시간값 초기화. setInterval로 시작.
                     if(index==1){
-                        clearInterval(thisVue.timer);
-                        thisVue.seconds=0;
+                        elapsedTime=0;
                     }
                     if(index==2){
                         console.log("Slide Start");
-                        thisVue.timer= setInterval(add,1);
+                        timeBegin = performance.now()
+                        console.log("timeBEGIN"+timeBegin)
                     }
 
                     console.log("Current Index>>>>"+index);
-                    console.log("TIME>>"+thisVue.seconds);
+                    console.log("performanceTiming>>>"+elapsedTime);
 
                     //끝나는 슬라이드, clearInterval, 시간값 초기화
                     if(index>=thisVue.imgList.length-1){
                         console.log("Slide End");
                         thisVue.exportData.push({
                             startTime: 0,
-                            endTime: timeTransition(thisVue.seconds)
+                            endTime: elapsedTime,
+                            startTime2:0
                         });
-                        console.log(thisVue.seconds);
-                        clearInterval(thisVue.timer);
-                        thisVue.seconds=0;
                     }
                 });
 
-                function add() {
-                    thisVue.seconds+=1;
+                //현재시간- 시작한 시간을 빼서 소요시간을 계산.
+                function Cal_date() {
+                    let currentTime = performance.now()
+                    elapsedTime= parseFloat(((currentTime-timeBegin)/1000).toFixed(3));
+
+                    return elapsedTime
                 }
 
-                function timeTransition(sec){
-                    return sec/250.0;
-                }
 
                 function slowEach( array, callback ) {
                     if( ! array.length ) return;
 
                     var i = 1;
                     var startTime, endTime;
-
                     next();
                     function next() {
 //다음 슬라이드가 마지막이거나, 슬라이드쇼에서 클릭을 했을때(slideShowbtnClicked==false일 경우)
@@ -461,42 +465,27 @@
                                 //console.log("number>>"+i);
                                 //console.log("METHOD>>"+array[i].tranMethod);
 //Time 설정. 이미지에서만 시간을 저장할 수 있도록
-                                startTime= timeTransition(thisVue.seconds);
+                                startTime= Cal_date();
 
-                                /*
-                                if(thisVue.imgList[i].isImg){
-                                    startTime= timeTransition(thisVue.seconds);
-                                } else{
-                                    startTime='';
-                                }
-*/
 
 //tranMethod가 keyboard인 경우
                                 if(array[i].tranMethod=='keyboard'){
                                     document.body.onkeydown = function(e) {
-                                        //console.log("KEYPRESSED>>"+e.code);
                                         //KeyO, KeyX, KeyA 값이 필요
                                         if(e.code=='KeyO'||e.code=='KeyX'||e.code=='KeyA'||e.code=='Space'){
                                            // console.log("Valid Key")
 
                                             //키를 누르는 순간 이미지가 끝나는 시간 저장.
                                             //imgList[i]가 이미지 이면 기록
-                                            endTime= timeTransition(thisVue.seconds);
-/*
-                                            if(thisVue.imgList[i].isImg){
-                                                endTime= timeTransition(thisVue.seconds);
-                                            } else{
-                                                endTime='';
-                                            }
-*/
+                                            endTime= Cal_date();
+
                                             let keyData={
                                                 imageName: thisVue.imgList[i].name,
                                                 keyInput: e.code.replace('Key',''),
                                                 startTime: startTime,
-                                                endTime: endTime
+                                                endTime: endTime,
                                             };
 
-                                           // console.log("KEYVALUE>>>"+e.code.replace('Key',''));
                                             if(i>1){
                                                 thisVue.exportData.push(keyData);
                                             }
@@ -518,14 +507,14 @@
                                     setTimeout( ()=>{
 
                                         //imgList[i]가 이미지 이면 기록
-                                        console.log()
+                                        console.log();
                                         if(thisVue.imgList[i].isImg){
-                                            endTime= timeTransition(thisVue.seconds);
+                                            endTime= Cal_date();
                                             let keyData={
                                                 imageName: thisVue.imgList[i].name,
                                                 keyInput: '',
                                                 startTime: startTime,
-                                                endTime: endTime
+                                                endTime: endTime,
                                             };
                                             thisVue.exportData.push(keyData);
                                         } else{
