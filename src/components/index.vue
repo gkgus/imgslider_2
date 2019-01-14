@@ -21,7 +21,7 @@
             <hr>
             <label for="userName">이름: </label>
             <input type="text" id="userName" placeholder="이름" v-model="userInfo.name">&nbsp;
-            <button @click="ExportBtn" :disabled="!csvExportBtn">KeyResult csv 파일 생성</button>
+            <button @click="ExportBtn" :disabled="!csvExportBtn">data csv 파일 생성</button>
             <br>
         </div>
         <div class="participantList">
@@ -35,9 +35,9 @@
                     <vue-csv-downloader
                             :data="exportDataList[user.id]"
                             :fields="exportDataFields"
-                            :download-name="user.id+'_'+user.name+'_keyResult.csv'"
+                            :download-name="user.id+'_'+user.name+'_data.csv'"
                     >
-                        {{user.id+'_'+user.name+'_keyResult'}} .csv
+                        {{user.id+'_'+user.name+'_data'}} .csv
                     </vue-csv-downloader>
                 </div>
 
