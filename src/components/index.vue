@@ -429,6 +429,10 @@
                     //끝나는 슬라이드, clearInterval, 시간값 초기화
                     if(index>=thisVue.imgList.length-1){
                         console.log("Slide End");
+                        thisVue.exportData.push({
+                            startTime: 0,
+                            endTime: timeTransition(thisVue.seconds)
+                        });
                         console.log(thisVue.seconds);
                         clearInterval(thisVue.timer);
                         thisVue.seconds=0;
