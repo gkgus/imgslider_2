@@ -8,8 +8,8 @@
         </div>
         <br>
 
-        <!--슬라이드쇼에서 컴포넌트를 통해 이미지 보여줌-->
-        <div class="slideImg" v-if="slideShowbtnClicked" @click="slideImgClicked()">
+        <!--슬라이드쇼에서 컴포넌트를 통해 이미지 보여줌 @click="slideImgClose()"-->
+        <div class="slideImg" v-if="slideShowbtnClicked" >
             <slideShowImg :width="window.width"
                           :height="window.height"
                           :imgsrc="currentSlideImg"
@@ -370,8 +370,6 @@
 
 //이미지를 클릭하면 값이 나옴, 이미지 각각의 값을 조정할 때
             imgClicked(id){
-                //console.log(id);
-                //console.log(this.imgList[id+1]);
                 //console.log(this.imgList)
                 this.clickedImg = id+1;
                 this.tranMethod=this.imgList[id+1].tranMethod;
@@ -435,7 +433,8 @@
                 //현재시간- 시작한 시간을 빼서 소요시간을 계산.
                 function Cal_date() {
                     let currentTime = performance.now();
-                    elapsedTime= parseFloat(((currentTime-timeBegin)/1000).toFixed(3));
+                    elapsedTime= parseInt((currentTime-timeBegin));
+                    //console.log(parseInt(currentTime-timeBegin));
                     return elapsedTime
                 }
 
@@ -476,7 +475,11 @@
                                             }
                                             i+=1;
                                             next();
-                                        } else{
+                                        }
+                                        else if(e.code=='KeyQ'){
+                                            thisVue.slideImgClose()
+                                        }
+                                        else{
                                             // console.log("Invalid Key")
                                         }
 //이미지 이름과 누른 키값을 keyData에 저장
@@ -484,7 +487,10 @@
                                     }
 //tranMethod가 time인 경우
                                 } else if(array[i].tranMethod=='time'){
-                                    document.body.onkeydown = function() {
+                                    document.body.onkeydown = function(e) {
+                                        if(e.code=='KeyQ'){
+                                            this.slideImgClose()
+                                        }
                                         //console.log("TIME_KEYPRESSED>>")
                                     }
                                     setTimeout( ()=>{
@@ -515,7 +521,7 @@
                 }
             },
 //슬라이드쇼에서 마우스를 클릭하면 나올 수 있도록 설정.
-            slideImgClicked(){
+            slideImgClose(){
                 this.slideShowbtnClicked=false;
             }
         }
